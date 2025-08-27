@@ -429,6 +429,11 @@ namespace WpfAppThreeD
                 z = Math.Max(minZ, Math.Min(maxZ, z));
 
                 UpdatePoint(x, y, z);
+
+                // ✅ Sync sliders
+                sliderX.Value = x;
+                sliderY.Value = y;
+                sliderZ.Value = z;
             }
         }
 
@@ -445,7 +450,32 @@ namespace WpfAppThreeD
                 minY = newMinY; maxY = newMaxY;
                 minZ = newMinZ; maxZ = newMaxZ;
 
-                DrawGrid(); // this will re-add pointSphere automatically
+                // ✅ Update sliders’ ranges
+                sliderX.Minimum = minX;
+                sliderX.Maximum = maxX;
+                sliderY.Minimum = minY;
+                sliderY.Maximum = maxY;
+                sliderZ.Minimum = minZ;
+                sliderZ.Maximum = maxZ;
+
+                // ✅ Clamp current values (so they don’t fall outside the new range)
+                double x = Math.Max(minX, Math.Min(maxX, pointSphere.Center.X));
+                double y = Math.Max(minY, Math.Min(maxY, pointSphere.Center.Y));
+                double z = Math.Max(minZ, Math.Min(maxZ, pointSphere.Center.Z));
+
+                // ✅ Update sliders to reflect clamped point
+                sliderX.Value = x;
+                sliderY.Value = y;
+                sliderZ.Value = z;
+
+                // ✅ Update point & textboxes to stay consistent
+                UpdatePoint(x, y, z);
+                txtX.Text = x.ToString("F2");
+                txtY.Text = y.ToString("F2");
+                txtZ.Text = z.ToString("F2");
+
+                // ✅ Redraw grid with new ranges
+                DrawGrid();
             }
         }
 
@@ -491,6 +521,11 @@ namespace WpfAppThreeD
                 txtX.Text = newX.ToString("F2");
                 txtY.Text = newY.ToString("F2");
                 txtZ.Text = newZ.ToString("F2");
+
+                // ✅ Update sliders too
+                sliderX.Value = newX;
+                sliderY.Value = newY;
+                sliderZ.Value = newZ;
 
                 lastMousePos = pos;
             }
