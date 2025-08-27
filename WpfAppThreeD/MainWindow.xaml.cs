@@ -26,127 +26,374 @@ namespace WpfAppThreeD
             AddPoint(0, 0, 0);
         }
 
+        //private void DrawGrid()
+        //{
+        //    view1.Children.Clear();
+        //    view1.Children.Add(new DefaultLights());
+
+        //    // ---------------- GRID PLANES ----------------
+        //    var gridXY = new LinesVisual3D { Color = Colors.LightGray, Thickness = 0.5 };
+        //    for (int y = (int)minY; y <= (int)maxY; y++)
+        //    {
+        //        gridXY.Points.Add(new Point3D(minX, y, 0));
+        //        gridXY.Points.Add(new Point3D(maxX, y, 0));
+        //    }
+        //    for (int x = (int)minX; x <= (int)maxX; x++)
+        //    {
+        //        gridXY.Points.Add(new Point3D(x, minY, 0));
+        //        gridXY.Points.Add(new Point3D(x, maxY, 0));
+        //    }
+        //    view1.Children.Add(gridXY);
+
+        //    var gridXZ = new LinesVisual3D { Color = Colors.LightGray, Thickness = 0.5 };
+        //    for (int z = (int)minZ; z <= (int)maxZ; z++)
+        //    {
+        //        gridXZ.Points.Add(new Point3D(minX, 0, z));
+        //        gridXZ.Points.Add(new Point3D(maxX, 0, z));
+        //    }
+        //    for (int x = (int)minX; x <= (int)maxX; x++)
+        //    {
+        //        gridXZ.Points.Add(new Point3D(x, 0, minZ));
+        //        gridXZ.Points.Add(new Point3D(x, 0, maxZ));
+        //    }
+        //    view1.Children.Add(gridXZ);
+
+        //    var gridYZ = new LinesVisual3D { Color = Colors.LightGray, Thickness = 0.5 };
+        //    for (int z = (int)minZ; z <= (int)maxZ; z++)
+        //    {
+        //        gridYZ.Points.Add(new Point3D(0, minY, z));
+        //        gridYZ.Points.Add(new Point3D(0, maxY, z));
+        //    }
+        //    for (int y = (int)minY; y <= (int)maxY; y++)
+        //    {
+        //        gridYZ.Points.Add(new Point3D(0, y, minZ));
+        //        gridYZ.Points.Add(new Point3D(0, y, maxZ));
+        //    }
+        //    view1.Children.Add(gridYZ);
+
+        //    // ---------------- AXES (separate for each color) ----------------
+        //    var axisX = new LinesVisual3D { Color = Colors.Red, Thickness = 2 };
+        //    axisX.Points.Add(new Point3D(minX, 0, 0));
+        //    axisX.Points.Add(new Point3D(maxX, 0, 0));
+        //    view1.Children.Add(axisX);
+
+        //    var axisY = new LinesVisual3D { Color = Colors.Green, Thickness = 2 };
+        //    axisY.Points.Add(new Point3D(0, minY, 0));
+        //    axisY.Points.Add(new Point3D(0, maxY, 0));
+        //    view1.Children.Add(axisY);
+
+        //    var axisZ = new LinesVisual3D { Color = Colors.Blue, Thickness = 2 };
+        //    axisZ.Points.Add(new Point3D(0, 0, minZ));
+        //    axisZ.Points.Add(new Point3D(0, 0, maxZ));
+        //    view1.Children.Add(axisZ);
+
+        //    // ---------------- LABELS ----------------
+        //    view1.Children.Add(new BillboardTextVisual3D { Text = "X", Position = new Point3D(maxX + 0.5, 0, 0), Foreground = Brushes.Red });
+        //    view1.Children.Add(new BillboardTextVisual3D { Text = "Y", Position = new Point3D(0, maxY + 0.5, 0), Foreground = Brushes.Green });
+        //    view1.Children.Add(new BillboardTextVisual3D { Text = "Z", Position = new Point3D(0, 0, maxZ + 0.5), Foreground = Brushes.Blue });
+
+        //    // ---------------- RULER TICKS ----------------
+        //    for (double x = minX; x <= maxX; x++)
+        //    {
+        //        view1.Children.Add(new LinesVisual3D { Color = Colors.Red, Points = new Point3DCollection { new Point3D(x, -0.1, 0), new Point3D(x, 0.1, 0) } });
+        //        view1.Children.Add(new BillboardTextVisual3D { Text = x.ToString(), Position = new Point3D(x, -0.3, 0), Foreground = Brushes.Red });
+        //    }
+        //    for (double y = minY; y <= maxY; y++)
+        //    {
+        //        view1.Children.Add(new LinesVisual3D { Color = Colors.Green, Points = new Point3DCollection { new Point3D(-0.1, y, 0), new Point3D(0.1, y, 0) } });
+        //        view1.Children.Add(new BillboardTextVisual3D { Text = y.ToString(), Position = new Point3D(-0.3, y, 0), Foreground = Brushes.Green });
+        //    }
+        //    for (double z = minZ; z <= maxZ; z++)
+        //    {
+        //        view1.Children.Add(new LinesVisual3D { Color = Colors.Blue, Points = new Point3DCollection { new Point3D(0, -0.1, z), new Point3D(0, 0.1, z) } });
+        //        view1.Children.Add(new BillboardTextVisual3D { Text = z.ToString(), Position = new Point3D(0, -0.3, z), Foreground = Brushes.Blue });
+        //    }
+
+        //    // ---------------- Restore Sphere & Guides ----------------
+        //    if (pointSphere != null)
+        //    {
+        //        if (view1.Children.Contains(pointSphere))
+        //            view1.Children.Remove(pointSphere);
+
+        //        view1.Children.Add(pointSphere);
+
+        //        Point3D p = pointSphere.Transform.Value.Transform(new Point3D(0, 0, 0));
+
+        //        // --- Projection guides (yellow box) ---
+        //        // Project to XY plane
+        //        Point3D pXY = new Point3D(p.X, p.Y, 0);
+        //        view1.Children.Add(new LinesVisual3D
+        //        {
+        //            Color = Colors.Yellow,
+        //            Thickness = 1,
+        //            Points = new Point3DCollection { p, pXY }
+        //        });
+
+        //        // Project to XZ plane
+        //        Point3D pXZ = new Point3D(p.X, 0, p.Z);
+        //        view1.Children.Add(new LinesVisual3D
+        //        {
+        //            Color = Colors.Yellow,
+        //            Thickness = 1,
+        //            Points = new Point3DCollection { p, pXZ }
+        //        });
+
+        //        // Project to YZ plane
+        //        Point3D pYZ = new Point3D(0, p.Y, p.Z);
+        //        view1.Children.Add(new LinesVisual3D
+        //        {
+        //            Color = Colors.Yellow,
+        //            Thickness = 1,
+        //            Points = new Point3DCollection { p, pYZ }
+        //        });
+
+        //        // --- Drop from planes to axes ---
+        //        view1.Children.Add(new LinesVisual3D
+        //        {
+        //            Color = Colors.Yellow,
+        //            Thickness = 1,
+        //            Points = new Point3DCollection { pXY, new Point3D(p.X, 0, 0) }
+        //        });
+        //        view1.Children.Add(new LinesVisual3D
+        //        {
+        //            Color = Colors.Yellow,
+        //            Thickness = 1,
+        //            Points = new Point3DCollection { pXZ, new Point3D(p.X, 0, 0) }
+        //        });
+        //        view1.Children.Add(new LinesVisual3D
+        //        {
+        //            Color = Colors.Yellow,
+        //            Thickness = 1,
+        //            Points = new Point3DCollection { pYZ, new Point3D(0, p.Y, 0) }
+        //        });
+
+        //        // Final connection to Z axis origin
+        //        view1.Children.Add(new LinesVisual3D
+        //        {
+        //            Color = Colors.Yellow,
+        //            Thickness = 1,
+        //            Points = new Point3DCollection { new Point3D(p.X, 0, 0), new Point3D(0, 0, 0) }
+        //        });
+        //        view1.Children.Add(new LinesVisual3D
+        //        {
+        //            Color = Colors.Yellow,
+        //            Thickness = 1,
+        //            Points = new Point3DCollection { new Point3D(0, p.Y, 0), new Point3D(0, 0, 0) }
+        //        });
+        //        view1.Children.Add(new LinesVisual3D
+        //        {
+        //            Color = Colors.Yellow,
+        //            Thickness = 1,
+        //            Points = new Point3DCollection { new Point3D(0, 0, p.Z), new Point3D(0, 0, 0) }
+        //        });
+        //    }
+        //}
+
+
+        //private void DrawGrid()
+        //{
+        //    view1.Children.Clear();
+        //    view1.Children.Add(new DefaultLights());
+
+        //     double.TryParse(txtStep.Text,out double step); // <-- set from txtStep
+
+        //    // ---------------- GRID PLANES ----------------
+        //    var gridXY = new LinesVisual3D { Color = Colors.LightGray, Thickness = 0.5 };
+        //    for (double y = minY; y <= maxY; y += step)
+        //    {
+        //        gridXY.Points.Add(new Point3D(minX, y, 0));
+        //        gridXY.Points.Add(new Point3D(maxX, y, 0));
+        //    }
+        //    for (double x = minX; x <= maxX; x += step)
+        //    {
+        //        gridXY.Points.Add(new Point3D(x, minY, 0));
+        //        gridXY.Points.Add(new Point3D(x, maxY, 0));
+        //    }
+        //    view1.Children.Add(gridXY);
+
+        //    var gridXZ = new LinesVisual3D { Color = Colors.LightGray, Thickness = 0.5 };
+        //    for (double z = minZ; z <= maxZ; z += step)
+        //    {
+        //        gridXZ.Points.Add(new Point3D(minX, 0, z));
+        //        gridXZ.Points.Add(new Point3D(maxX, 0, z));
+        //    }
+        //    for (double x = minX; x <= maxX; x += step)
+        //    {
+        //        gridXZ.Points.Add(new Point3D(x, 0, minZ));
+        //        gridXZ.Points.Add(new Point3D(x, 0, maxZ));
+        //    }
+        //    view1.Children.Add(gridXZ);
+
+        //    var gridYZ = new LinesVisual3D { Color = Colors.LightGray, Thickness = 0.5 };
+        //    for (double z = minZ; z <= maxZ; z += step)
+        //    {
+        //        gridYZ.Points.Add(new Point3D(0, minY, z));
+        //        gridYZ.Points.Add(new Point3D(0, maxY, z));
+        //    }
+        //    for (double y = minY; y <= maxY; y += step)
+        //    {
+        //        gridYZ.Points.Add(new Point3D(0, y, minZ));
+        //        gridYZ.Points.Add(new Point3D(0, y, maxZ));
+        //    }
+        //    view1.Children.Add(gridYZ);
+
+        //    // ---------------- AXES ----------------
+        //    view1.Children.Add(new LinesVisual3D { Color = Colors.Red, Thickness = 2, Points = new Point3DCollection { new Point3D(minX, 0, 0), new Point3D(maxX, 0, 0) } });
+        //    view1.Children.Add(new LinesVisual3D { Color = Colors.Green, Thickness = 2, Points = new Point3DCollection { new Point3D(0, minY, 0), new Point3D(0, maxY, 0) } });
+        //    view1.Children.Add(new LinesVisual3D { Color = Colors.Blue, Thickness = 2, Points = new Point3DCollection { new Point3D(0, 0, minZ), new Point3D(0, 0, maxZ) } });
+
+        //    // ---------------- AXIS LABELS ----------------
+        //    view1.Children.Add(new BillboardTextVisual3D { Text = "X", Position = new Point3D(maxX + 0.5, 0, 0), Foreground = Brushes.Red });
+        //    view1.Children.Add(new BillboardTextVisual3D { Text = "Y", Position = new Point3D(0, maxY + 0.5, 0), Foreground = Brushes.Green });
+        //    view1.Children.Add(new BillboardTextVisual3D { Text = "Z", Position = new Point3D(0, 0, maxZ + 0.5), Foreground = Brushes.Blue });
+
+        //    // ---------------- RULER TICKS ----------------
+        //    for (double x = minX; x <= maxX; x += step)
+        //    {
+        //        view1.Children.Add(new LinesVisual3D { Color = Colors.Red, Points = new Point3DCollection { new Point3D(x, -0.1, 0), new Point3D(x, 0.1, 0) } });
+        //        view1.Children.Add(new BillboardTextVisual3D { Text = x.ToString("0.###"), Position = new Point3D(x, -0.3, 0), Foreground = Brushes.Red });
+        //    }
+        //    for (double y = minY; y <= maxY; y += step)
+        //    {
+        //        view1.Children.Add(new LinesVisual3D { Color = Colors.Green, Points = new Point3DCollection { new Point3D(-0.1, y, 0), new Point3D(0.1, y, 0) } });
+        //        view1.Children.Add(new BillboardTextVisual3D { Text = y.ToString("0.###"), Position = new Point3D(-0.3, y, 0), Foreground = Brushes.Green });
+        //    }
+        //    for (double z = minZ; z <= maxZ; z += step)
+        //    {
+        //        view1.Children.Add(new LinesVisual3D { Color = Colors.Blue, Points = new Point3DCollection { new Point3D(0, -0.1, z), new Point3D(0, 0.1, z) } });
+        //        view1.Children.Add(new BillboardTextVisual3D { Text = z.ToString("0.###"), Position = new Point3D(0, -0.3, z), Foreground = Brushes.Blue });
+        //    }
+
+        //    // ---------------- Sphere & Yellow Guides ----------------
+        //    if (pointSphere != null)
+        //    {
+        //        if (view1.Children.Contains(pointSphere))
+        //            view1.Children.Remove(pointSphere);
+
+        //        view1.Children.Add(pointSphere);
+
+        //        Point3D p = pointSphere.Center; // ✅ correct way
+
+        //        // Yellow guide lines to each axis
+        //        view1.Children.Add(new LinesVisual3D { Color = Colors.Yellow, Points = new Point3DCollection { p, new Point3D(p.X, 0, 0) } });
+        //        view1.Children.Add(new LinesVisual3D { Color = Colors.Yellow, Points = new Point3DCollection { p, new Point3D(0, p.Y, 0) } });
+        //        view1.Children.Add(new LinesVisual3D { Color = Colors.Yellow, Points = new Point3DCollection { p, new Point3D(0, 0, p.Z) } });
+        //    }
+        //}
+
         private void DrawGrid()
         {
-            // remove previous grid
             view1.Children.Clear();
             view1.Children.Add(new DefaultLights());
 
-            double step = 1.0;
+            double.TryParse(txtStep.Text, out double step); // <-- set from txtStep
 
-            // Draw X axis lines in YZ plane
-            for (double x = minX; x <= maxX; x += step)
-            {
-                var line1 = new LinesVisual3D
-                {
-                    Points = new Point3DCollection
-            {
-                new Point3D(x, minY, 0),
-                new Point3D(x, maxY, 0)
-            },
-                    Color = Colors.LightGray,
-                    Thickness = 1
-                };
-                view1.Children.Add(line1);
-
-                var line2 = new LinesVisual3D
-                {
-                    Points = new Point3DCollection
-            {
-                new Point3D(x, 0, minZ),
-                new Point3D(x, 0, maxZ)
-            },
-                    Color = Colors.LightGray,
-                    Thickness = 1
-                };
-                view1.Children.Add(line2);
-            }
-
-            // Draw Y axis lines in XZ plane
+            // ---------------- GRID PLANES ----------------
+            var gridXY = new LinesVisual3D { Color = Colors.LightGray, Thickness = 0.5 };
             for (double y = minY; y <= maxY; y += step)
             {
-                var line1 = new LinesVisual3D
-                {
-                    Points = new Point3DCollection
-            {
-                new Point3D(minX, y, 0),
-                new Point3D(maxX, y, 0)
-            },
-                    Color = Colors.LightGray,
-                    Thickness = 1
-                };
-                view1.Children.Add(line1);
-
-                var line2 = new LinesVisual3D
-                {
-                    Points = new Point3DCollection
-            {
-                new Point3D(0, y, minZ),
-                new Point3D(0, y, maxZ)
-            },
-                    Color = Colors.LightGray,
-                    Thickness = 1
-                };
-                view1.Children.Add(line2);
+                gridXY.Points.Add(new Point3D(minX, y, 0));
+                gridXY.Points.Add(new Point3D(maxX, y, 0));
             }
+            for (double x = minX; x <= maxX; x += step)
+            {
+                gridXY.Points.Add(new Point3D(x, minY, 0));
+                gridXY.Points.Add(new Point3D(x, maxY, 0));
+            }
+            view1.Children.Add(gridXY);
 
-            // Draw Z axis lines in XY plane
+            var gridXZ = new LinesVisual3D { Color = Colors.LightGray, Thickness = 0.5 };
             for (double z = minZ; z <= maxZ; z += step)
             {
-                var line1 = new LinesVisual3D
-                {
-                    Points = new Point3DCollection
+                gridXZ.Points.Add(new Point3D(minX, 0, z));
+                gridXZ.Points.Add(new Point3D(maxX, 0, z));
+            }
+            for (double x = minX; x <= maxX; x += step)
             {
-                new Point3D(minX, 0, z),
-                new Point3D(maxX, 0, z)
-            },
-                    Color = Colors.LightGray,
-                    Thickness = 1
-                };
-                view1.Children.Add(line1);
+                gridXZ.Points.Add(new Point3D(x, 0, minZ));
+                gridXZ.Points.Add(new Point3D(x, 0, maxZ));
+            }
+            view1.Children.Add(gridXZ);
 
-                var line2 = new LinesVisual3D
-                {
-                    Points = new Point3DCollection
+            var gridYZ = new LinesVisual3D { Color = Colors.LightGray, Thickness = 0.5 };
+            for (double z = minZ; z <= maxZ; z += step)
             {
-                new Point3D(0, minY, z),
-                new Point3D(0, maxY, z)
-            },
-                    Color = Colors.LightGray,
-                    Thickness = 1
-                };
-                view1.Children.Add(line2);
+                gridYZ.Points.Add(new Point3D(0, minY, z));
+                gridYZ.Points.Add(new Point3D(0, maxY, z));
+            }
+            for (double y = minY; y <= maxY; y += step)
+            {
+                gridYZ.Points.Add(new Point3D(0, y, minZ));
+                gridYZ.Points.Add(new Point3D(0, y, maxZ));
+            }
+            view1.Children.Add(gridYZ);
+
+            // ---------------- AXES ----------------
+            view1.Children.Add(new LinesVisual3D { Color = Colors.Red, Thickness = 2, Points = new Point3DCollection { new Point3D(minX, 0, 0), new Point3D(maxX, 0, 0) } });
+            view1.Children.Add(new LinesVisual3D { Color = Colors.Green, Thickness = 2, Points = new Point3DCollection { new Point3D(0, minY, 0), new Point3D(0, maxY, 0) } });
+            view1.Children.Add(new LinesVisual3D { Color = Colors.Blue, Thickness = 2, Points = new Point3DCollection { new Point3D(0, 0, minZ), new Point3D(0, 0, maxZ) } });
+
+            // ---------------- AXIS LABELS ----------------
+            view1.Children.Add(new BillboardTextVisual3D { Text = "X", Position = new Point3D(maxX + 0.5, 0, 0), Foreground = Brushes.Red });
+            view1.Children.Add(new BillboardTextVisual3D { Text = "Y", Position = new Point3D(0, maxY + 0.5, 0), Foreground = Brushes.Green });
+            view1.Children.Add(new BillboardTextVisual3D { Text = "Z", Position = new Point3D(0, 0, maxZ + 0.5), Foreground = Brushes.Blue });
+
+            // ---------------- RULER TICKS ----------------
+            for (double x = minX; x <= maxX; x += step)
+            {
+                view1.Children.Add(new LinesVisual3D { Color = Colors.Red, Points = new Point3DCollection { new Point3D(x, -0.1, 0), new Point3D(x, 0.1, 0) } });
+                view1.Children.Add(new BillboardTextVisual3D { Text = x.ToString("0.###"), Position = new Point3D(x, -0.3, 0), Foreground = Brushes.Red });
+            }
+            for (double y = minY; y <= maxY; y += step)
+            {
+                view1.Children.Add(new LinesVisual3D { Color = Colors.Green, Points = new Point3DCollection { new Point3D(-0.1, y, 0), new Point3D(0.1, y, 0) } });
+                view1.Children.Add(new BillboardTextVisual3D { Text = y.ToString("0.###"), Position = new Point3D(-0.3, y, 0), Foreground = Brushes.Green });
+            }
+            for (double z = minZ; z <= maxZ; z += step)
+            {
+                view1.Children.Add(new LinesVisual3D { Color = Colors.Blue, Points = new Point3DCollection { new Point3D(0, -0.1, z), new Point3D(0, 0.1, z) } });
+                view1.Children.Add(new BillboardTextVisual3D { Text = z.ToString("0.###"), Position = new Point3D(0, -0.3, z), Foreground = Brushes.Blue });
             }
 
-            // Axes (Red = X, Green = Y, Blue = Z)
-            view1.Children.Add(new LinesVisual3D
-            {
-                Points = new Point3DCollection { new Point3D(minX, 0, 0), new Point3D(maxX, 0, 0) },
-                Color = Colors.Red,
-                Thickness = 2
-            });
-            view1.Children.Add(new LinesVisual3D
-            {
-                Points = new Point3DCollection { new Point3D(0, minY, 0), new Point3D(0, maxY, 0) },
-                Color = Colors.Green,
-                Thickness = 2
-            });
-            view1.Children.Add(new LinesVisual3D
-            {
-                Points = new Point3DCollection { new Point3D(0, 0, minZ), new Point3D(0, 0, maxZ) },
-                Color = Colors.Blue,
-                Thickness = 2
-            });
-
-            // Re-add point sphere if exists
+            // ---------------- Sphere & Yellow Guides ----------------
             if (pointSphere != null)
             {
                 if (view1.Children.Contains(pointSphere))
                     view1.Children.Remove(pointSphere);
 
                 view1.Children.Add(pointSphere);
+
+                Point3D p = pointSphere.Center; // ✅ correct way
+
+                // Yellow guide lines (thicker & more visible)
+                var guideThickness = 2.0;
+
+                // To X-axis
+                view1.Children.Add(new LinesVisual3D
+                {
+                    Color = Colors.Yellow,
+                    Thickness = guideThickness,
+                    Points = new Point3DCollection { p, new Point3D(p.X, 0, 0) }
+                });
+
+                // To Y-axis
+                view1.Children.Add(new LinesVisual3D
+                {
+                    Color = Colors.Yellow,
+                    Thickness = guideThickness,
+                    Points = new Point3DCollection { p, new Point3D(0, p.Y, 0) }
+                });
+
+                // To Z-axis
+                view1.Children.Add(new LinesVisual3D
+                {
+                    Color = Colors.Yellow,
+                    Thickness = guideThickness,
+                    Points = new Point3DCollection { p, new Point3D(0, 0, p.Z) }
+                });
             }
         }
+
 
 
         private void AddPoint(double x, double y, double z)
@@ -198,11 +445,7 @@ namespace WpfAppThreeD
                 minY = newMinY; maxY = newMaxY;
                 minZ = newMinZ; maxZ = newMaxZ;
 
-                view1.Children.Clear();
-                view1.Children.Add(new DefaultLights());
-
-                DrawGrid();
-                AddPoint(pointSphere.Center.X, pointSphere.Center.Y, pointSphere.Center.Z);
+                DrawGrid(); // this will re-add pointSphere automatically
             }
         }
 
@@ -251,6 +494,11 @@ namespace WpfAppThreeD
 
                 lastMousePos = pos;
             }
+        }
+
+        private void btnSetStep_Click(object sender, RoutedEventArgs e)
+        {
+            DrawGrid();
         }
 
         private void view1_MouseWheel(object sender, MouseWheelEventArgs e)

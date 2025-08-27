@@ -18,6 +18,13 @@
                 <Button x:Name="btnSet" Content="Set Point" Margin="10,0,0,0" Click="btnSet_Click"/>
             </StackPanel>
 
+            <!-- Step -->
+            <StackPanel Orientation="Horizontal" Margin="5">
+                <TextBlock Text="Step:" VerticalAlignment="Center"/>
+                <TextBox x:Name="txtStep" Width="50" Text="1"/>
+                <Button x:Name="btnSetStep" Content="Set Point" Margin="10,0,0,0" Click="btnSetStep_Click"/>
+            </StackPanel>
+
             <!-- Sliders -->
             <StackPanel Orientation="Horizontal" Margin="5">
                 <TextBlock Text="X:" VerticalAlignment="Center"/>
