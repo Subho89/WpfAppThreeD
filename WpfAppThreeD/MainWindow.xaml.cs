@@ -356,42 +356,201 @@ namespace WpfAppThreeD
             }
 
             // ---------------- Sphere & Yellow Guides ----------------
-            if (pointSphere != null)
+            //if (pointSphere != null)
+            //{
+            //    if (view1.Children.Contains(pointSphere))
+            //        view1.Children.Remove(pointSphere);
+
+            //    view1.Children.Add(pointSphere);
+
+            //    Point3D p = pointSphere.Center; // ✅ correct way
+
+            //    // Yellow guide lines (thicker & more visible)
+            //    var guideThickness = 2.0;
+
+            //    // To X-axis
+            //    view1.Children.Add(new LinesVisual3D
+            //    {
+            //        Color = Colors.Yellow,
+            //        Thickness = guideThickness,
+            //        Points = new Point3DCollection { p, new Point3D(p.X, 0, 0) }
+            //    });
+
+            //    // To Y-axis
+            //    view1.Children.Add(new LinesVisual3D
+            //    {
+            //        Color = Colors.Yellow,
+            //        Thickness = guideThickness,
+            //        Points = new Point3DCollection { p, new Point3D(0, p.Y, 0) }
+            //    });
+
+            //    // To Z-axis
+            //    view1.Children.Add(new LinesVisual3D
+            //    {
+            //        Color = Colors.Yellow,
+            //        Thickness = guideThickness,
+            //        Points = new Point3DCollection { p, new Point3D(0, 0, p.Z) }
+            //    });
+            //}
+        }
+
+        //private void DrawGuides(Point3D p)
+        //{
+        //    // remove old yellow lines first
+        //    for (int i = view1.Children.Count - 1; i >= 0; i--)
+        //    {
+        //        if (view1.Children[i] is LinesVisual3D line &&
+        //            line.Color == Colors.Yellow)
+        //        {
+        //            view1.Children.RemoveAt(i);
+        //        }
+        //    }
+
+        //    var guideThickness = 2.0;
+
+        //    // --- Build cube-corner style guides ---
+        //    // From (p.X, 0, 0) up to (p.X, p.Y, 0)
+        //    view1.Children.Add(new LinesVisual3D
+        //    {
+        //        Color = Colors.Yellow,
+        //        Thickness = guideThickness,
+        //        Points = new Point3DCollection
+        //{
+        //    new Point3D(p.X, 0, 0),
+        //    new Point3D(p.X, p.Y, 0)
+        //}
+        //    });
+
+        //    // From (0, p.Y, 0) across to (p.X, p.Y, 0)
+        //    view1.Children.Add(new LinesVisual3D
+        //    {
+        //        Color = Colors.Yellow,
+        //        Thickness = guideThickness,
+        //        Points = new Point3DCollection
+        //{
+        //    new Point3D(0, p.Y, 0),
+        //    new Point3D(p.X, p.Y, 0)
+        //}
+        //    });
+
+        //    // From (p.X, p.Y, 0) up to (p.X, p.Y, p.Z)
+        //    view1.Children.Add(new LinesVisual3D
+        //    {
+        //        Color = Colors.Yellow,
+        //        Thickness = guideThickness,
+        //        Points = new Point3DCollection
+        //{
+        //    new Point3D(p.X, p.Y, 0),
+        //    new Point3D(p.X, p.Y, p.Z)
+        //}
+        //    });
+        //}
+
+
+        private void DrawGuides(Point3D p)
+        {
+            // remove old guide lines (yellow + black)
+            for (int i = view1.Children.Count - 1; i >= 0; i--)
             {
-                if (view1.Children.Contains(pointSphere))
-                    view1.Children.Remove(pointSphere);
-
-                view1.Children.Add(pointSphere);
-
-                Point3D p = pointSphere.Center; // ✅ correct way
-
-                // Yellow guide lines (thicker & more visible)
-                var guideThickness = 2.0;
-
-                // To X-axis
-                view1.Children.Add(new LinesVisual3D
+                if (view1.Children[i] is LinesVisual3D line &&
+                    (line.Color == Colors.Yellow || line.Color == Colors.Black))
                 {
-                    Color = Colors.Yellow,
-                    Thickness = guideThickness,
-                    Points = new Point3DCollection { p, new Point3D(p.X, 0, 0) }
-                });
-
-                // To Y-axis
-                view1.Children.Add(new LinesVisual3D
-                {
-                    Color = Colors.Yellow,
-                    Thickness = guideThickness,
-                    Points = new Point3DCollection { p, new Point3D(0, p.Y, 0) }
-                });
-
-                // To Z-axis
-                view1.Children.Add(new LinesVisual3D
-                {
-                    Color = Colors.Yellow,
-                    Thickness = guideThickness,
-                    Points = new Point3DCollection { p, new Point3D(0, 0, p.Z) }
-                });
+                    view1.Children.RemoveAt(i);
+                }
             }
+
+            var guideThickness = 2.0;
+
+            // === Yellow Guides (corner style) ===
+            view1.Children.Add(new LinesVisual3D
+            {
+                Color = Colors.Yellow,
+                Thickness = guideThickness,
+                Points = new Point3DCollection
+        {
+            new Point3D(p.X, 0, 0),
+            new Point3D(p.X, p.Y, 0)
+        }
+            });
+
+            view1.Children.Add(new LinesVisual3D
+            {
+                Color = Colors.Yellow,
+                Thickness = guideThickness,
+                Points = new Point3DCollection
+        {
+            new Point3D(0, p.Y, 0),
+            new Point3D(p.X, p.Y, 0)
+        }
+            });
+
+            view1.Children.Add(new LinesVisual3D
+            {
+                Color = Colors.Yellow,
+                Thickness = guideThickness,
+                Points = new Point3DCollection
+        {
+            new Point3D(p.X, p.Y, 0),
+            new Point3D(p.X, p.Y, p.Z)
+        }
+            });
+
+            // === Black Bounding Box ===
+            // bottom rectangle (z=0)
+            view1.Children.Add(new LinesVisual3D
+            {
+                Color = Colors.Black,
+                Thickness = guideThickness,
+                Points = new Point3DCollection
+        {
+            new Point3D(0, 0, 0),
+            new Point3D(p.X, 0, 0),
+
+            new Point3D(p.X, 0, 0),
+            new Point3D(p.X, p.Y, 0),
+
+            new Point3D(p.X, p.Y, 0),
+            new Point3D(0, p.Y, 0),
+
+            new Point3D(0, p.Y, 0),
+            new Point3D(0, 0, 0)
+        }
+            });
+
+            // top rectangle (z = p.Z)
+            view1.Children.Add(new LinesVisual3D
+            {
+                Color = Colors.Black,
+                Thickness = guideThickness,
+                Points = new Point3DCollection
+        {
+            new Point3D(0, 0, p.Z),
+            new Point3D(p.X, 0, p.Z),
+
+            new Point3D(p.X, 0, p.Z),
+            new Point3D(p.X, p.Y, p.Z),
+
+            new Point3D(p.X, p.Y, p.Z),
+            new Point3D(0, p.Y, p.Z),
+
+            new Point3D(0, p.Y, p.Z),
+            new Point3D(0, 0, p.Z)
+        }
+            });
+
+            // vertical edges
+            view1.Children.Add(new LinesVisual3D
+            {
+                Color = Colors.Black,
+                Thickness = guideThickness,
+                Points = new Point3DCollection
+        {
+            new Point3D(0, 0, 0), new Point3D(0, 0, p.Z),
+            new Point3D(p.X, 0, 0), new Point3D(p.X, 0, p.Z),
+            new Point3D(p.X, p.Y, 0), new Point3D(p.X, p.Y, p.Z),
+            new Point3D(0, p.Y, 0), new Point3D(0, p.Y, p.Z)
+        }
+            });
         }
 
 
@@ -412,9 +571,18 @@ namespace WpfAppThreeD
 
         private void UpdatePoint(double x, double y, double z)
         {
+            //if (pointSphere != null)
+            //{
+            //    ((SphereVisual3D)pointSphere).Center = new Point3D(x, y, z);
+            //}
+
             if (pointSphere != null)
             {
                 ((SphereVisual3D)pointSphere).Center = new Point3D(x, y, z);
+
+                // ✅ draw guides right after update
+                DrawGuides(new Point3D(x, y, z));
+                
             }
         }
 
@@ -437,6 +605,48 @@ namespace WpfAppThreeD
             }
         }
 
+        //private void btnSetRange_Click(object sender, RoutedEventArgs e)
+        //{
+        //    if (double.TryParse(txtMinX.Text, out double newMinX) &&
+        //        double.TryParse(txtMaxX.Text, out double newMaxX) &&
+        //        double.TryParse(txtMinY.Text, out double newMinY) &&
+        //        double.TryParse(txtMaxY.Text, out double newMaxY) &&
+        //        double.TryParse(txtMinZ.Text, out double newMinZ) &&
+        //        double.TryParse(txtMaxZ.Text, out double newMaxZ))
+        //    {
+        //        minX = newMinX; maxX = newMaxX;
+        //        minY = newMinY; maxY = newMaxY;
+        //        minZ = newMinZ; maxZ = newMaxZ;
+
+        //        // ✅ Update sliders’ ranges
+        //        sliderX.Minimum = minX;
+        //        sliderX.Maximum = maxX;
+        //        sliderY.Minimum = minY;
+        //        sliderY.Maximum = maxY;
+        //        sliderZ.Minimum = minZ;
+        //        sliderZ.Maximum = maxZ;
+
+        //        // ✅ Clamp current values (so they don’t fall outside the new range)
+        //        double x = Math.Max(minX, Math.Min(maxX, pointSphere.Center.X));
+        //        double y = Math.Max(minY, Math.Min(maxY, pointSphere.Center.Y));
+        //        double z = Math.Max(minZ, Math.Min(maxZ, pointSphere.Center.Z));
+
+        //        // ✅ Update sliders to reflect clamped point
+        //        sliderX.Value = x;
+        //        sliderY.Value = y;
+        //        sliderZ.Value = z;
+
+        //        // ✅ Update point & textboxes to stay consistent
+        //        UpdatePoint(x, y, z);
+        //        txtX.Text = x.ToString("F2");
+        //        txtY.Text = y.ToString("F2");
+        //        txtZ.Text = z.ToString("F2");
+
+        //        // ✅ Redraw grid with new ranges
+        //        DrawGrid();
+        //    }
+        //}
+
         private void btnSetRange_Click(object sender, RoutedEventArgs e)
         {
             if (double.TryParse(txtMinX.Text, out double newMinX) &&
@@ -446,38 +656,25 @@ namespace WpfAppThreeD
                 double.TryParse(txtMinZ.Text, out double newMinZ) &&
                 double.TryParse(txtMaxZ.Text, out double newMaxZ))
             {
+                // update ranges
                 minX = newMinX; maxX = newMaxX;
                 minY = newMinY; maxY = newMaxY;
                 minZ = newMinZ; maxZ = newMaxZ;
 
-                // ✅ Update sliders’ ranges
-                sliderX.Minimum = minX;
-                sliderX.Maximum = maxX;
-                sliderY.Minimum = minY;
-                sliderY.Maximum = maxY;
-                sliderZ.Minimum = minZ;
-                sliderZ.Maximum = maxZ;
-
-                // ✅ Clamp current values (so they don’t fall outside the new range)
-                double x = Math.Max(minX, Math.Min(maxX, pointSphere.Center.X));
-                double y = Math.Max(minY, Math.Min(maxY, pointSphere.Center.Y));
-                double z = Math.Max(minZ, Math.Min(maxZ, pointSphere.Center.Z));
-
-                // ✅ Update sliders to reflect clamped point
-                sliderX.Value = x;
-                sliderY.Value = y;
-                sliderZ.Value = z;
-
-                // ✅ Update point & textboxes to stay consistent
-                UpdatePoint(x, y, z);
-                txtX.Text = x.ToString("F2");
-                txtY.Text = y.ToString("F2");
-                txtZ.Text = z.ToString("F2");
-
-                // ✅ Redraw grid with new ranges
+                // redraw grid
                 DrawGrid();
+                
+                // reset sliders
+                sliderX.Minimum = minX; sliderX.Maximum = maxX; sliderX.Value = 0;
+                sliderY.Minimum = minY; sliderY.Maximum = maxY; sliderY.Value = 0;
+                sliderZ.Minimum = minZ; sliderZ.Maximum = maxZ; sliderZ.Value = 0;
+
+                // reset sphere and guides to (0,0,0)
+                UpdatePoint(0, 0, 0);
+                AddPoint(0, 0, 0);
             }
         }
+
 
         private void view1_MouseDown(object sender, MouseButtonEventArgs e)
         {
@@ -529,6 +726,9 @@ namespace WpfAppThreeD
 
                 lastMousePos = pos;
             }
+
+            // ---------------- Sphere & Yellow Guides ----------------
+
         }
 
         private void btnSetStep_Click(object sender, RoutedEventArgs e)
