@@ -104,14 +104,14 @@ namespace WpfAppThreeD
             }            
         }
 
-        
+
         private void DrawGuides(Point3D p)
         {
             // remove old guide lines (yellow + black)
             for (int i = view1.Children.Count - 1; i >= 0; i--)
             {
                 if (view1.Children[i] is LinesVisual3D line &&
-                    (line.Color == Colors.Yellow || line.Color == Colors.Black))
+                    (line.Color == Colors.Goldenrod || line.Color == Colors.Black))
                 {
                     view1.Children.RemoveAt(i);
                 }
@@ -122,94 +122,107 @@ namespace WpfAppThreeD
             // === Yellow Guides (corner style) ===
             view1.Children.Add(new LinesVisual3D
             {
-                Color = Colors.Yellow,
+                Color = Colors.Goldenrod,   // darker yellow
                 Thickness = guideThickness,
                 Points = new Point3DCollection
-        {
-            new Point3D(p.X, 0, 0),
-            new Point3D(p.X, p.Y, 0)
-        }
+            {
+                new Point3D(p.X, 0, 0),
+                new Point3D(p.X, p.Y, 0)
+            }
             });
 
             view1.Children.Add(new LinesVisual3D
             {
-                Color = Colors.Yellow,
+                Color = Colors.Goldenrod,
                 Thickness = guideThickness,
                 Points = new Point3DCollection
-        {
-            new Point3D(0, p.Y, 0),
-            new Point3D(p.X, p.Y, 0)
-        }
+            {
+                new Point3D(0, p.Y, 0),
+                new Point3D(p.X, p.Y, 0)
+            }
             });
 
             view1.Children.Add(new LinesVisual3D
             {
-                Color = Colors.Yellow,
+                Color = Colors.Goldenrod,
+                Thickness = guideThickness,
+                Points = new Point3DCollection
+            {
+                new Point3D(p.X, p.Y, 0),
+                new Point3D(p.X, p.Y, p.Z)
+            }
+            });
+
+            // ✅ New guide from Z axis to pointer
+            view1.Children.Add(new LinesVisual3D
+            {
+                Color = Colors.Goldenrod,
                 Thickness = guideThickness,
                 Points = new Point3DCollection
         {
-            new Point3D(p.X, p.Y, 0),
+            new Point3D(0, 0, p.Z),
             new Point3D(p.X, p.Y, p.Z)
         }
             });
 
             // === Black Bounding Box ===
             // bottom rectangle (z=0)
-            view1.Children.Add(new LinesVisual3D
-            {
-                Color = Colors.Black,
-                Thickness = guideThickness,
-                Points = new Point3DCollection
-        {
-            new Point3D(0, 0, 0),
-            new Point3D(p.X, 0, 0),
+            //    view1.Children.Add(new LinesVisual3D
+            //    {
+            //        Color = Colors.Black,
+            //        Thickness = guideThickness,
+            //        Points = new Point3DCollection
+            //{
+            //    new Point3D(0, 0, 0),
+            //    new Point3D(p.X, 0, 0),
 
-            new Point3D(p.X, 0, 0),
-            new Point3D(p.X, p.Y, 0),
+            //    new Point3D(p.X, 0, 0),
+            //    new Point3D(p.X, p.Y, 0),
 
-            new Point3D(p.X, p.Y, 0),
-            new Point3D(0, p.Y, 0),
+            //    new Point3D(p.X, p.Y, 0),
+            //    new Point3D(0, p.Y, 0),
 
-            new Point3D(0, p.Y, 0),
-            new Point3D(0, 0, 0)
+            //    new Point3D(0, p.Y, 0),
+            //    new Point3D(0, 0, 0)
+            //}
+            //    });
+
+            //    // top rectangle (z = p.Z)
+            //    view1.Children.Add(new LinesVisual3D
+            //    {
+            //        Color = Colors.Black,
+            //        Thickness = guideThickness,
+            //        Points = new Point3DCollection
+            //{
+            //    new Point3D(0, 0, p.Z),
+            //    new Point3D(p.X, 0, p.Z),
+
+            //    new Point3D(p.X, 0, p.Z),
+            //    new Point3D(p.X, p.Y, p.Z),
+
+            //    new Point3D(p.X, p.Y, p.Z),
+            //    new Point3D(0, p.Y, p.Z),
+
+            //    new Point3D(0, p.Y, p.Z),
+            //    new Point3D(0, 0, p.Z)
+            //}
+            //    });
+
+            //    // vertical edges
+            //    view1.Children.Add(new LinesVisual3D
+            //    {
+            //        Color = Colors.Black,
+            //        Thickness = guideThickness,
+            //        Points = new Point3DCollection
+            //{
+            //    new Point3D(0, 0, 0), new Point3D(0, 0, p.Z),
+            //    new Point3D(p.X, 0, 0), new Point3D(p.X, 0, p.Z),
+            //    new Point3D(p.X, p.Y, 0), new Point3D(p.X, p.Y, p.Z),
+            //    new Point3D(0, p.Y, 0), new Point3D(0, p.Y, p.Z)
+            //}
+            //    });
         }
-            });
 
-            // top rectangle (z = p.Z)
-            view1.Children.Add(new LinesVisual3D
-            {
-                Color = Colors.Black,
-                Thickness = guideThickness,
-                Points = new Point3DCollection
-        {
-            new Point3D(0, 0, p.Z),
-            new Point3D(p.X, 0, p.Z),
-
-            new Point3D(p.X, 0, p.Z),
-            new Point3D(p.X, p.Y, p.Z),
-
-            new Point3D(p.X, p.Y, p.Z),
-            new Point3D(0, p.Y, p.Z),
-
-            new Point3D(0, p.Y, p.Z),
-            new Point3D(0, 0, p.Z)
-        }
-            });
-
-            // vertical edges
-            view1.Children.Add(new LinesVisual3D
-            {
-                Color = Colors.Black,
-                Thickness = guideThickness,
-                Points = new Point3DCollection
-        {
-            new Point3D(0, 0, 0), new Point3D(0, 0, p.Z),
-            new Point3D(p.X, 0, 0), new Point3D(p.X, 0, p.Z),
-            new Point3D(p.X, p.Y, 0), new Point3D(p.X, p.Y, p.Z),
-            new Point3D(0, p.Y, 0), new Point3D(0, p.Y, p.Z)
-        }
-            });
-        }
 
 
 
@@ -372,6 +385,18 @@ namespace WpfAppThreeD
         private void btnSetStep_Click(object sender, RoutedEventArgs e)
         {
             DrawGrid();
+
+            // ✅ Restore the pointer sphere
+            if (pointSphere != null)
+                view1.Children.Add(pointSphere);
+
+            // ✅ Restore the coordinate label
+            if (coordLabel != null)
+                view1.Children.Add(coordLabel);
+
+            if (pointSphere != null)
+                DrawGuides(pointSphere.Center);
+
         }
 
         private void view1_MouseWheel(object sender, MouseWheelEventArgs e)
