@@ -21,6 +21,8 @@ namespace WpfAppThreeD
 
         private BillboardTextVisual3D coordLabel;
 
+        private bool isPerspective = true;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -33,7 +35,7 @@ namespace WpfAppThreeD
                 cam.Position = new Point3D(20, 20, 20);      // now at +X +Y +Z corner
                 cam.LookDirection = new Vector3D(-20, -20, -20); // looking back at origin
                 cam.UpDirection = new Vector3D(0, 0, 1);     // Z axis is up
-            }            
+            }
         }
 
 
@@ -163,7 +165,7 @@ namespace WpfAppThreeD
             {
                 view1.Children.Add(new LinesVisual3D { Color = Colors.Blue, Points = new Point3DCollection { new Point3D(0, -0.1, z), new Point3D(0, 0.1, z) } });
                 view1.Children.Add(new BillboardTextVisual3D { Text = z.ToString("0.###"), Position = new Point3D(0, -0.3, z), Foreground = Brushes.Blue });
-            }            
+            }
         }
 
 
@@ -315,7 +317,7 @@ namespace WpfAppThreeD
             coordLabel = new BillboardTextVisual3D
             {
                 Text = text,
-                Position = new Point3D(p.X + 2, p.Y + 2, p.Z + 2), 
+                Position = new Point3D(p.X + 2, p.Y + 2, p.Z + 2),
                 Foreground = Brushes.DarkBlue,
                 FontWeight = FontWeights.Bold,
                 FontSize = 16
@@ -337,7 +339,7 @@ namespace WpfAppThreeD
 
                 // draw guides right after update
                 DrawGuides(new Point3D(x, y, z));
-                
+
             }
         }
 
@@ -376,7 +378,7 @@ namespace WpfAppThreeD
 
                 // redraw grid
                 DrawGrid();
-                
+
                 // reset sliders
                 sliderX.Minimum = minX; sliderX.Maximum = maxX; sliderX.Value = 0;
                 sliderY.Minimum = minY; sliderY.Maximum = maxY; sliderY.Value = 0;
@@ -389,15 +391,7 @@ namespace WpfAppThreeD
         }
 
 
-        private void view1_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-            if (e.LeftButton == MouseButtonState.Pressed)
-            {
-                isDragging = true;
-                lastMousePos = e.GetPosition(view1);
-                Mouse.Capture(view1);
-            }
-        }
+        
 
         private void view1_MouseMove(object sender, MouseEventArgs e)
         {
@@ -412,13 +406,13 @@ namespace WpfAppThreeD
 
                 if (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift))
                 {
-                    // control Z
+                    // Control Z
                     double dz = -(pos.Y - lastMousePos.Y) * (maxZ - minZ) / 500;
                     newZ = Math.Max(minZ, Math.Min(maxZ, current.Z + dz));
                 }
                 else
                 {
-                    //  control X/Y
+                    // Control X/Y
                     double dx = (pos.X - lastMousePos.X) * (maxX - minX) / 500;
                     double dy = -(pos.Y - lastMousePos.Y) * (maxY - minY) / 500;
 
@@ -426,23 +420,62 @@ namespace WpfAppThreeD
                     newY = Math.Max(minY, Math.Min(maxY, current.Y + dy));
                 }
 
-                UpdatePoint(newX, newY, newZ);
+                //  Snap-to-Grid logic
+                double step = 1;
+                double.TryParse(txtStep.Text, out step);
 
+                if (chkSnapToGrid.IsChecked == true)
+                {
+                    newX = GetSnappedValue(newX, step);
+                    newY = GetSnappedValue(newY, step);
+                    newZ = GetSnappedValue(newZ, step);
+                }
+
+                // Apply updates
+                UpdatePoint(newX, newY, newZ);
                 UpdateSphereLabel(new Point3D(newX, newY, newZ));
 
                 txtX.Text = newX.ToString("F2");
                 txtY.Text = newY.ToString("F2");
                 txtZ.Text = newZ.ToString("F2");
 
-                //Update sliders too
+                // Update sliders too
                 sliderX.Value = newX;
                 sliderY.Value = newY;
                 sliderZ.Value = newZ;
 
                 lastMousePos = pos;
             }
-
         }
+
+        //private void view1_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        //{
+        //    if (isDragging && pointSphere != null)
+        //    {
+        //        isDragging = false;
+
+        //        double step = 1;
+        //        double.TryParse(txtStep.Text, out step);
+
+        //        if (chkSnapToGrid.IsChecked == true)
+        //        {
+        //            double newX = GetSnappedValue(pointSphere.Center.X, step);
+        //            double newY = GetSnappedValue(pointSphere.Center.Y, step);
+        //            double newZ = GetSnappedValue(pointSphere.Center.Z, step);
+
+        //            UpdatePoint(newX, newY, newZ);
+        //            UpdateSphereLabel(new Point3D(newX, newY, newZ));
+
+        //            txtX.Text = newX.ToString("F2");
+        //            txtY.Text = newY.ToString("F2");
+        //            txtZ.Text = newZ.ToString("F2");
+
+        //            sliderX.Value = newX;
+        //            sliderY.Value = newY;
+        //            sliderZ.Value = newZ;
+        //        }
+        //    }
+        //}
 
         private void btnSetStep_Click(object sender, RoutedEventArgs e)
         {
@@ -479,18 +512,129 @@ namespace WpfAppThreeD
             }
         }
 
-        private void view1_MouseUp(object sender, MouseButtonEventArgs e)
+        private void view1_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            isDragging = false;
-            Mouse.Capture(null);
+            if (pointSphere != null)
+            {
+                isDragging = true;
+                lastMousePos = e.GetPosition(view1);
+                view1.CaptureMouse(); // lock mouse to viewport
+            }
+        }
+
+        private void view1_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            if (isDragging)
+            {
+                isDragging = false;
+                view1.ReleaseMouseCapture();
+
+                // Final snap-to-grid adjustment
+                if (pointSphere != null && chkSnapToGrid.IsChecked == true)
+                {
+                    double step = 1;
+                    double.TryParse(txtStep.Text, out step);
+
+                    double newX = GetSnappedValue(pointSphere.Center.X, step);
+                    double newY = GetSnappedValue(pointSphere.Center.Y, step);
+                    double newZ = GetSnappedValue(pointSphere.Center.Z, step);
+
+                    UpdatePoint(newX, newY, newZ);
+                    UpdateSphereLabel(new Point3D(newX, newY, newZ));
+
+                    txtX.Text = newX.ToString("F2");
+                    txtY.Text = newY.ToString("F2");
+                    txtZ.Text = newZ.ToString("F2");
+
+                    sliderX.Value = newX;
+                    sliderY.Value = newY;
+                    sliderZ.Value = newZ;
+                }
+            }
         }
 
         private void Slider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             if (pointSphere != null)
             {
-                UpdatePoint(sliderX.Value, sliderY.Value, sliderZ.Value);
+                double newX = sliderX.Value;
+                double newY = sliderY.Value;
+                double newZ = sliderZ.Value;
+
+                //  Snap-to-Grid logic
+                double step = 1;
+                double.TryParse(txtStep.Text, out step);
+
+                if (chkSnapToGrid.IsChecked == true)
+                {
+                    newX = GetSnappedValue(newX, step);
+                    newY = GetSnappedValue(newY, step);
+                    newZ = GetSnappedValue(newZ, step);
+
+                    // Update sliders to reflect snapped values
+                    sliderX.Value = newX;
+                    sliderY.Value = newY;
+                    sliderZ.Value = newZ;
+                }
+
+                // Apply updates
+                UpdatePoint(newX, newY, newZ);
+                UpdateSphereLabel(new Point3D(newX, newY, newZ));
+
+                txtX.Text = newX.ToString("F2");
+                txtY.Text = newY.ToString("F2");
+                txtZ.Text = newZ.ToString("F2");
             }
         }
+
+
+        private void SwitchCamera_Click(object sender, RoutedEventArgs e)
+        {
+            // Get current camera (works for both Perspective and Orthographic)
+            var currentCam = view1.Camera;
+
+            Point3D position = currentCam.Position;
+            Vector3D lookDirection = currentCam.LookDirection;
+            Vector3D upDirection = currentCam.UpDirection;
+
+            // Calculate distance from camera to target (scene center = 0,0,0 here)
+            Point3D target = new Point3D(0, 0, 0);
+            double distance = (position - target).Length;
+
+            if (isPerspective)
+            {
+                // Switch to Orthographic while preserving view
+                view1.Camera = new OrthographicCamera
+                {
+                    Position = position,
+                    LookDirection = lookDirection,
+                    UpDirection = upDirection,
+                    Width = distance // width scales with distance
+                };
+
+                btnSwitchCamera.Content = "Switch to Perspective View";
+            }
+            else
+            {
+                // Switch to Perspective while preserving view
+                view1.Camera = new PerspectiveCamera
+                {
+                    Position = position,
+                    LookDirection = lookDirection,
+                    UpDirection = upDirection,
+                    FieldOfView = 45
+                };
+
+                btnSwitchCamera.Content = "Switch to Orthographic View";
+            }
+
+            isPerspective = !isPerspective;
+        }
+
+        private double GetSnappedValue(double value, double step)
+        {
+            return Math.Round(value / step) * step;
+        }
+
     }
 }
