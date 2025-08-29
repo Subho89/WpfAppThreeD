@@ -26,6 +26,14 @@ namespace WpfAppThreeD
             InitializeComponent();
             DrawGrid();
             AddPoint(0, 0, 0);
+
+            var cam = view1.Camera as PerspectiveCamera;
+            if (cam != null)
+            {
+                cam.Position = new Point3D(20, 20, 20);      // now at +X +Y +Z corner
+                cam.LookDirection = new Vector3D(-20, -20, -20); // looking back at origin
+                cam.UpDirection = new Vector3D(0, 0, 1);     // Z axis is up
+            }            
         }
 
 
@@ -35,6 +43,37 @@ namespace WpfAppThreeD
             view1.Children.Add(new DefaultLights());
 
             double.TryParse(txtStep.Text, out double step); // <-- set from txtStep
+
+            var box = new LinesVisual3D { Color = Colors.Black, Thickness = 1.5 };
+            Point3D p000 = new Point3D(minX, minY, minZ);
+            Point3D p100 = new Point3D(maxX, minY, minZ);
+            Point3D p010 = new Point3D(minX, maxY, minZ);
+            Point3D p110 = new Point3D(maxX, maxY, minZ);
+
+            Point3D p001 = new Point3D(minX, minY, maxZ);
+            Point3D p101 = new Point3D(maxX, minY, maxZ);
+            Point3D p011 = new Point3D(minX, maxY, maxZ);
+            Point3D p111 = new Point3D(maxX, maxY, maxZ);
+
+            // bottom square
+            box.Points.Add(p000); box.Points.Add(p100);
+            box.Points.Add(p100); box.Points.Add(p110);
+            box.Points.Add(p110); box.Points.Add(p010);
+            box.Points.Add(p010); box.Points.Add(p000);
+
+            // top square
+            box.Points.Add(p001); box.Points.Add(p101);
+            box.Points.Add(p101); box.Points.Add(p111);
+            box.Points.Add(p111); box.Points.Add(p011);
+            box.Points.Add(p011); box.Points.Add(p001);
+
+            // vertical edges
+            box.Points.Add(p000); box.Points.Add(p001);
+            box.Points.Add(p100); box.Points.Add(p101);
+            box.Points.Add(p110); box.Points.Add(p111);
+            box.Points.Add(p010); box.Points.Add(p011);
+
+            view1.Children.Add(box);
 
             // ---------------- GRID PLANES ----------------
             var gridXY = new LinesVisual3D { Color = Colors.LightGray, Thickness = 0.5 };
@@ -82,9 +121,32 @@ namespace WpfAppThreeD
             view1.Children.Add(new LinesVisual3D { Color = Colors.Blue, Thickness = 2, Points = new Point3DCollection { new Point3D(0, 0, minZ), new Point3D(0, 0, maxZ) } });
 
             // ---------------- AXIS LABELS ----------------
-            view1.Children.Add(new BillboardTextVisual3D { Text = "X", Position = new Point3D(maxX + 0.5, 0, 0), Foreground = Brushes.Red });
-            view1.Children.Add(new BillboardTextVisual3D { Text = "Y", Position = new Point3D(0, maxY + 0.5, 0), Foreground = Brushes.Green });
-            view1.Children.Add(new BillboardTextVisual3D { Text = "Z", Position = new Point3D(0, 0, maxZ + 0.5), Foreground = Brushes.Blue });
+            view1.Children.Add(new BillboardTextVisual3D
+            {
+                Text = "X",
+                Position = new Point3D(maxX + 0.5, 0, 0),
+                Foreground = Brushes.Red,
+                FontSize = 24,
+                FontWeight = FontWeights.Bold
+            });
+
+            view1.Children.Add(new BillboardTextVisual3D
+            {
+                Text = "Y",
+                Position = new Point3D(0, maxY + 0.5, 0),
+                Foreground = Brushes.Green,
+                FontSize = 24,
+                FontWeight = FontWeights.Bold
+            });
+
+            view1.Children.Add(new BillboardTextVisual3D
+            {
+                Text = "Z",
+                Position = new Point3D(0, 0, maxZ + 0.5),
+                Foreground = Brushes.Blue,
+                FontSize = 24,
+                FontWeight = FontWeights.Bold
+            });
 
             // ---------------- RULER TICKS ----------------
             for (double x = minX; x <= maxX; x += step)
@@ -107,11 +169,11 @@ namespace WpfAppThreeD
 
         private void DrawGuides(Point3D p)
         {
-            // remove old guide lines (yellow + black)
+            // remove old guide lines
             for (int i = view1.Children.Count - 1; i >= 0; i--)
             {
                 if (view1.Children[i] is LinesVisual3D line &&
-                    (line.Color == Colors.Goldenrod || line.Color == Colors.Black))
+                    (line.Color == Colors.Goldenrod))
                 {
                     view1.Children.RemoveAt(i);
                 }
@@ -119,7 +181,7 @@ namespace WpfAppThreeD
 
             var guideThickness = 2.0;
 
-            // === Yellow Guides (corner style) ===
+            // === Yellow Guides===
             view1.Children.Add(new LinesVisual3D
             {
                 Color = Colors.Goldenrod,   // darker yellow
@@ -153,7 +215,7 @@ namespace WpfAppThreeD
             }
             });
 
-            // ✅ New guide from Z axis to pointer
+            // New guide from Z axis to pointer
             view1.Children.Add(new LinesVisual3D
             {
                 Color = Colors.Goldenrod,
@@ -246,14 +308,14 @@ namespace WpfAppThreeD
             if (coordLabel != null)
                 view1.Children.Remove(coordLabel);
 
-            // format coordinates nicely
+            // format coordinates
             string text = $"({p.X:0.0}, {p.Y:0.0}, {p.Z:0.0})";
 
-            // create label just offset from the sphere
+            // create label
             coordLabel = new BillboardTextVisual3D
             {
                 Text = text,
-                Position = new Point3D(p.X + 2, p.Y + 2, p.Z + 2), // offset a bit so it’s visible
+                Position = new Point3D(p.X + 2, p.Y + 2, p.Z + 2), 
                 Foreground = Brushes.DarkBlue,
                 FontWeight = FontWeights.Bold,
                 FontSize = 16
@@ -273,7 +335,7 @@ namespace WpfAppThreeD
             {
                 ((SphereVisual3D)pointSphere).Center = new Point3D(x, y, z);
 
-                // ✅ draw guides right after update
+                // draw guides right after update
                 DrawGuides(new Point3D(x, y, z));
                 
             }
@@ -291,7 +353,7 @@ namespace WpfAppThreeD
 
                 UpdatePoint(x, y, z);
 
-                // ✅ Sync sliders
+                // Sync sliders
                 sliderX.Value = x;
                 sliderY.Value = y;
                 sliderZ.Value = z;
@@ -350,13 +412,13 @@ namespace WpfAppThreeD
 
                 if (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift))
                 {
-                    // Shift + Drag => control Z
+                    // control Z
                     double dz = -(pos.Y - lastMousePos.Y) * (maxZ - minZ) / 500;
                     newZ = Math.Max(minZ, Math.Min(maxZ, current.Z + dz));
                 }
                 else
                 {
-                    // Normal drag => control X/Y
+                    //  control X/Y
                     double dx = (pos.X - lastMousePos.X) * (maxX - minX) / 500;
                     double dy = -(pos.Y - lastMousePos.Y) * (maxY - minY) / 500;
 
@@ -372,7 +434,7 @@ namespace WpfAppThreeD
                 txtY.Text = newY.ToString("F2");
                 txtZ.Text = newZ.ToString("F2");
 
-                // ✅ Update sliders too
+                //Update sliders too
                 sliderX.Value = newX;
                 sliderY.Value = newY;
                 sliderZ.Value = newZ;
@@ -386,11 +448,11 @@ namespace WpfAppThreeD
         {
             DrawGrid();
 
-            // ✅ Restore the pointer sphere
+            //Restore the pointer sphere
             if (pointSphere != null)
                 view1.Children.Add(pointSphere);
 
-            // ✅ Restore the coordinate label
+            //Restore the coordinate label
             if (coordLabel != null)
                 view1.Children.Add(coordLabel);
 
