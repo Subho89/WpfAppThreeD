@@ -7,73 +7,141 @@
     <DockPanel>
         <!-- Control Panel -->
         <StackPanel DockPanel.Dock="Top" Orientation="Vertical" Margin="10">
-            <!-- Manual Input -->
-            <StackPanel Orientation="Horizontal" Margin="5">
-                <TextBlock Text="X:" VerticalAlignment="Center"/>
-                <TextBox x:Name="txtX" Width="50" Text="0"/>
-                <TextBlock Text="Y:" VerticalAlignment="Center" Margin="5,0,0,0"/>
-                <TextBox x:Name="txtY" Width="50" Text="0"/>
-                <TextBlock Text="Z:" VerticalAlignment="Center" Margin="5,0,0,0"/>
-                <TextBox x:Name="txtZ" Width="50" Text="0"/>
-                <Button x:Name="btnSet" Content="Set Point" Margin="10,0,0,0" Click="btnSet_Click"/>
-            </StackPanel>
 
-            <!-- Step + Camera Controls -->
-            <StackPanel Orientation="Horizontal" Margin="5" VerticalAlignment="Center">
-                <TextBlock Text="Step:" VerticalAlignment="Center"/>
-                <TextBox x:Name="txtStep" Width="50" Text="1"/>
-                <Button x:Name="btnSetStep" Content="Set Step" Margin="10,0,0,0" Click="btnSetStep_Click"/>
+            <!-- Two column layout -->
+            <Grid Margin="5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <!-- Equal width -->
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
 
-                <!-- Snap to Grid checkbox -->
-                <CheckBox x:Name="chkSnapToGrid" Content="Snap to Grid" Margin="20,0,0,0" IsChecked="True"/>
+                <!-- Left Column : XYZ + Step + View inside GroupBox -->               
 
-                <!-- Camera switch button -->
-                <TextBlock Text="View:" VerticalAlignment="Center" Margin="15,0,0,0"/>
-                <Button x:Name="btnSwitchCamera" Content="Switch to Ortho" Margin="5,0,0,0" Click="SwitchCamera_Click"/>
+                <GroupBox Header="Point View Controls" Grid.Column="0" Margin="5,5,5,0">
+                    <Grid Margin="10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
 
-               
-            </StackPanel>
+                        <!-- LEFT COLUMN: XYZ, Step, Snap, Camera -->
+                        <StackPanel Orientation="Vertical" Margin="5" Grid.Column="0">
+                            <!-- XYZ Input -->
+                            <StackPanel Orientation="Horizontal" Margin="5">
+                                <TextBlock Text="X:" VerticalAlignment="Center"/>
+                                <TextBox x:Name="txtX" Width="50" Text="0" Margin="5,0"/>
+                                <TextBlock Text="Y:" VerticalAlignment="Center"/>
+                                <TextBox x:Name="txtY" Width="50" Text="0" Margin="5,0"/>
+                                <TextBlock Text="Z:" VerticalAlignment="Center"/>
+                                <TextBox x:Name="txtZ" Width="50" Text="0" Margin="5,0"/>
+                            </StackPanel>
 
-            <!-- Sliders -->
-            <StackPanel Orientation="Horizontal" Margin="5">
-                <TextBlock Text="X:" VerticalAlignment="Center"/>
-                <Slider x:Name="sliderX" Width="200" Minimum="-10" Maximum="10" Value="0"
-                        ValueChanged="Slider_ValueChanged"/>
-                <TextBlock Text="Y:" VerticalAlignment="Center" Margin="10,0,0,0"/>
-                <Slider x:Name="sliderY" Width="200" Minimum="-10" Maximum="10" Value="0"
-                        ValueChanged="Slider_ValueChanged"/>
-                <TextBlock Text="Z:" VerticalAlignment="Center" Margin="10,0,0,0"/>
-                <Slider x:Name="sliderZ" Width="200" Minimum="-10" Maximum="10" Value="0"
-                        ValueChanged="Slider_ValueChanged"/>
-            </StackPanel>
+                            <!-- Step + Snap to Grid -->
+                            <StackPanel Orientation="Horizontal" Margin="5">
+                                <TextBlock Text="Step:" VerticalAlignment="Center"/>
+                                <TextBox x:Name="txtStep" Width="50" Text="1" Margin="5,0"/>
+                                <CheckBox x:Name="chkSnapToGrid" Content="Snap to Grid" Margin="20,0,0,0" IsChecked="False"/>
+                            </StackPanel>
 
-            <!-- Range Settings -->
-            <StackPanel Orientation="Horizontal" Margin="5">
-                <TextBlock Text="Range X:" VerticalAlignment="Center"/>
-                <TextBox x:Name="txtMinX" Width="50" Text="-10"/>
-                <TextBlock Text="to" VerticalAlignment="Center"/>
-                <TextBox x:Name="txtMaxX" Width="50" Text="10"/>
+                            <!-- Camera Switch -->
+                            <StackPanel Orientation="Horizontal" Margin="5">
+                                <TextBlock Text="View:" VerticalAlignment="Center"/>
+                                <Button x:Name="btnSwitchCamera" Content="Switch to Ortho" Margin="10,0,0,0" Click="SwitchCamera_Click"/>
+                            </StackPanel>
+                        </StackPanel>
 
-                <TextBlock Text=" Y:" VerticalAlignment="Center" Margin="10,0,0,0"/>
-                <TextBox x:Name="txtMinY" Width="50" Text="-10"/>
-                <TextBlock Text="to" VerticalAlignment="Center"/>
-                <TextBox x:Name="txtMaxY" Width="50" Text="10"/>
+                        <!-- RIGHT COLUMN: Sliders with Min/Max -->
+                        <StackPanel Orientation="Vertical" Margin="5" Grid.Column="1">
 
-                <TextBlock Text=" Z:" VerticalAlignment="Center" Margin="10,0,0,0"/>
-                <TextBox x:Name="txtMinZ" Width="50" Text="-10"/>
-                <TextBlock Text="to" VerticalAlignment="Center"/>
-                <TextBox x:Name="txtMaxZ" Width="50" Text="10"/>
+                            <!-- Font Size -->
+                            <Grid Margin="5">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="80"/>
+                                    <!-- Label -->
+                                    <ColumnDefinition Width="50"/>
+                                    <!-- Min -->
+                                    <ColumnDefinition Width="*"/>
+                                    <!-- Slider -->
+                                    <ColumnDefinition Width="50"/>
+                                    <!-- Max -->
+                                </Grid.ColumnDefinitions>
 
-                <Button x:Name="btnSetRange" Content="Set Range" Margin="10,0,0,0" Click="btnSetRange_Click"/>
-            </StackPanel>
+                                <TextBlock Text="Font Size:" VerticalAlignment="Center" Grid.Column="0"/>
+                                <TextBox x:Name="txtFontMin" Grid.Column="1" Text="5" PreviewTextInput="NumberValidationTextBox" Margin="5,0"/>
+                                <Slider x:Name="sliderFontSize" Grid.Column="2" Minimum="5" Maximum="30" Value="12"
+                        TickFrequency="1" IsSnapToTickEnabled="false" Margin="5,0"/>
+                                <TextBox x:Name="txtFontMax" Grid.Column="3" Text="30" PreviewTextInput="NumberValidationTextBox" Margin="5,0"/>
+                            </Grid>
+
+                            <!-- Point Size -->
+                            <Grid Margin="5">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="80"/>
+                                    <!-- Label -->
+                                    <ColumnDefinition Width="50"/>
+                                    <!-- Min -->
+                                    <ColumnDefinition Width="*"/>
+                                    <!-- Slider -->
+                                    <ColumnDefinition Width="50"/>
+                                    <!-- Max -->
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock Text="Point Size:" VerticalAlignment="Center" Grid.Column="0"/>
+                                <TextBox x:Name="txtPointMin" Grid.Column="1" Text="0.1" PreviewTextInput="NumberValidationTextBox" Margin="5,0"/>
+                                <Slider x:Name="sliderPointSize" Grid.Column="2" Minimum="0.1" Maximum="1" Value="0.2"
+                        TickFrequency="0.1" IsSnapToTickEnabled="false" Margin="5,0"/>
+                                <TextBox x:Name="txtPointMax" Grid.Column="3" Text="1" PreviewTextInput="NumberValidationTextBox" Margin="5,0"/>
+                            </Grid>
+
+                        </StackPanel>
+                    </Grid>
+                </GroupBox>
+
+
+                <!-- Right Column : Axis Controls -->
+                <GroupBox Header="Axis Controls" Grid.Column="1" Margin="5,5,5,0">
+                    <StackPanel Orientation="Vertical" Margin="10">
+                        <!-- X Axis -->
+                        <StackPanel Orientation="Horizontal" Margin="5">
+                            <TextBlock Text="X:" Width="20" VerticalAlignment="Center"/>
+                            <TextBox x:Name="txtMinX" Width="50" Text="-10" VerticalAlignment="Center" Margin="5,0" />
+                            <Slider x:Name="sliderX" Width="200" Minimum="-10" Maximum="10" Value="0"
+                                    ValueChanged="Slider_ValueChanged" Margin="5,0"/>
+                            <TextBox x:Name="txtMaxX" Width="50" Text="10" VerticalAlignment="Center" Margin="5,0" />
+                        </StackPanel>
+
+                        <!-- Y Axis -->
+                        <StackPanel Orientation="Horizontal" Margin="5">
+                            <TextBlock Text="Y:" Width="20" VerticalAlignment="Center"/>
+                            <TextBox x:Name="txtMinY" Width="50" Text="-10" VerticalAlignment="Center" Margin="5,0" />
+                            <Slider x:Name="sliderY" Width="200" Minimum="-10" Maximum="10" Value="0"
+                                    ValueChanged="Slider_ValueChanged" Margin="5,0"/>
+                            <TextBox x:Name="txtMaxY" Width="50" Text="10" VerticalAlignment="Center" Margin="5,0" />
+                        </StackPanel>
+
+                        <!-- Z Axis -->
+                        <StackPanel Orientation="Horizontal" Margin="5">
+                            <TextBlock Text="Z:" Width="20" VerticalAlignment="Center"/>
+                            <TextBox x:Name="txtMinZ" Width="50" Text="-10" VerticalAlignment="Center" Margin="5,0" />
+                            <Slider x:Name="sliderZ" Width="200" Minimum="-10" Maximum="10" Value="0"
+                                    ValueChanged="Slider_ValueChanged" Margin="5,0"/>
+                            <TextBox x:Name="txtMaxZ" Width="50" Text="10" VerticalAlignment="Center" Margin="5,0" />
+                        </StackPanel>
+
+                        <!-- Apply Button -->
+                        <!--<Button x:Name="btnSetRange" Content="Apply Ranges" Width="120" Margin="5"/>-->
+                    </StackPanel>
+                </GroupBox>
+            </Grid>
         </StackPanel>
 
         <!-- 3D View -->
         <h:HelixViewport3D x:Name="view1" ShowCoordinateSystem="True"
                            ShowViewCube="True" ZoomExtentsWhenLoaded="True"
                            MouseLeftButtonDown="view1_MouseLeftButtonDown"
-                            MouseMove="view1_MouseMove"
-                            MouseLeftButtonUp="view1_MouseLeftButtonUp">        
+                           MouseMove="view1_MouseMove"
+                           MouseLeftButtonUp="view1_MouseLeftButtonUp">
             <h:DefaultLights/>
         </h:HelixViewport3D>
     </DockPanel>

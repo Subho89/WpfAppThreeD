@@ -1,6 +1,8 @@
 ﻿using HelixToolkit.Wpf;
 using System;
+using System.Reflection.Emit;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Media3D;
@@ -21,21 +23,46 @@ namespace WpfAppThreeD
 
         private BillboardTextVisual3D coordLabel;
 
+        // Keep references to axis labels for font size updates
+        private BillboardTextVisual3D xLabel, yLabel, zLabel;
+
         private bool isPerspective = true;
 
         public MainWindow()
         {
+            
             InitializeComponent();
             DrawGrid();
-            AddPoint(0, 0, 0);
+            AddPoint(0, 0, 0);           
 
             var cam = view1.Camera as PerspectiveCamera;
             if (cam != null)
             {
-                cam.Position = new Point3D(20, 20, 20);      // now at +X +Y +Z corner
-                cam.LookDirection = new Vector3D(-20, -20, -20); // looking back at origin
-                cam.UpDirection = new Vector3D(0, 0, 1);     // Z axis is up
+                //cam.Position = new Point3D(20, 20, 20);      // now at +X +Y +Z corner
+                //cam.LookDirection = new Vector3D(-20, -20, -20); // looking back at origin
+                //cam.UpDirection = new Vector3D(0, 0, 1);     // Z axis is up
+
+                cam.Position = new Point3D(0, 0, 86.71035032622612);      // now at +X +Y +Z corner
+                cam.LookDirection = new Vector3D(-0, -0, -86.71035032622612); // looking back at origin
+                cam.UpDirection = new Vector3D(0, 1, 0);
             }
+
+            txtX.TextChanged += txtPointerInput_TextChanged;
+            txtY.TextChanged += txtPointerInput_TextChanged;
+            txtZ.TextChanged += txtPointerInput_TextChanged;
+            txtStep.TextChanged += txtStep_TextChanged;
+            txtMinX.TextChanged += txtRange_TextChanged;
+            txtMinY.TextChanged += txtRange_TextChanged;
+            txtMinZ.TextChanged += txtRange_TextChanged;
+            txtMaxX.TextChanged += txtRange_TextChanged;
+            txtMaxY.TextChanged += txtRange_TextChanged;
+            txtMaxZ.TextChanged += txtRange_TextChanged;
+            sliderPointSize.ValueChanged += sliderPointSize_ValueChanged;
+            sliderFontSize.ValueChanged += sliderFontSize_ValueChanged;
+            txtFontMin.TextChanged += txtFont_TextChanged;
+            txtFontMax.TextChanged += txtFont_TextChanged;
+            txtPointMin.TextChanged += txtPoint_TextChanged;
+            txtPointMax.TextChanged += txtPoint_TextChanged;
         }
 
 
@@ -123,48 +150,54 @@ namespace WpfAppThreeD
             view1.Children.Add(new LinesVisual3D { Color = Colors.Blue, Thickness = 2, Points = new Point3DCollection { new Point3D(0, 0, minZ), new Point3D(0, 0, maxZ) } });
 
             // ---------------- AXIS LABELS ----------------
-            view1.Children.Add(new BillboardTextVisual3D
+
+            xLabel = new BillboardTextVisual3D
             {
                 Text = "X",
                 Position = new Point3D(maxX + 0.5, 0, 0),
                 Foreground = Brushes.Red,
-                FontSize = 24,
+                FontSize = sliderFontSize.Value,
                 FontWeight = FontWeights.Bold
-            });
+            };
 
-            view1.Children.Add(new BillboardTextVisual3D
+            view1.Children.Add(xLabel);
+
+            yLabel = new BillboardTextVisual3D
             {
                 Text = "Y",
                 Position = new Point3D(0, maxY + 0.5, 0),
                 Foreground = Brushes.Green,
-                FontSize = 24,
+                FontSize = sliderFontSize.Value,
                 FontWeight = FontWeights.Bold
-            });
+            };
 
-            view1.Children.Add(new BillboardTextVisual3D
+            view1.Children.Add(yLabel);
+
+            zLabel = new BillboardTextVisual3D
             {
                 Text = "Z",
                 Position = new Point3D(0, 0, maxZ + 0.5),
                 Foreground = Brushes.Blue,
-                FontSize = 24,
+                FontSize = sliderFontSize.Value,
                 FontWeight = FontWeights.Bold
-            });
+            };
+            view1.Children.Add(zLabel);
 
             // ---------------- RULER TICKS ----------------
             for (double x = minX; x <= maxX; x += step)
             {
                 view1.Children.Add(new LinesVisual3D { Color = Colors.Red, Points = new Point3DCollection { new Point3D(x, -0.1, 0), new Point3D(x, 0.1, 0) } });
-                view1.Children.Add(new BillboardTextVisual3D { Text = x.ToString("0.###"), Position = new Point3D(x, -0.3, 0), Foreground = Brushes.Red });
+                view1.Children.Add(new BillboardTextVisual3D { Text = x.ToString("0.###"), Position = new Point3D(x, -0.3, 0), Foreground = Brushes.Red,FontSize= sliderFontSize.Value });
             }
             for (double y = minY; y <= maxY; y += step)
             {
                 view1.Children.Add(new LinesVisual3D { Color = Colors.Green, Points = new Point3DCollection { new Point3D(-0.1, y, 0), new Point3D(0.1, y, 0) } });
-                view1.Children.Add(new BillboardTextVisual3D { Text = y.ToString("0.###"), Position = new Point3D(-0.3, y, 0), Foreground = Brushes.Green });
+                view1.Children.Add(new BillboardTextVisual3D { Text = y.ToString("0.###"), Position = new Point3D(-0.3, y, 0), Foreground = Brushes.Green,FontSize= sliderFontSize.Value });
             }
             for (double z = minZ; z <= maxZ; z += step)
             {
                 view1.Children.Add(new LinesVisual3D { Color = Colors.Blue, Points = new Point3DCollection { new Point3D(0, -0.1, z), new Point3D(0, 0.1, z) } });
-                view1.Children.Add(new BillboardTextVisual3D { Text = z.ToString("0.###"), Position = new Point3D(0, -0.3, z), Foreground = Brushes.Blue });
+                view1.Children.Add(new BillboardTextVisual3D { Text = z.ToString("0.###"), Position = new Point3D(0, -0.3, z), Foreground = Brushes.Blue,FontSize= sliderFontSize.Value });
             }
         }
 
@@ -229,62 +262,6 @@ namespace WpfAppThreeD
         }
             });
 
-            // === Black Bounding Box ===
-            // bottom rectangle (z=0)
-            //    view1.Children.Add(new LinesVisual3D
-            //    {
-            //        Color = Colors.Black,
-            //        Thickness = guideThickness,
-            //        Points = new Point3DCollection
-            //{
-            //    new Point3D(0, 0, 0),
-            //    new Point3D(p.X, 0, 0),
-
-            //    new Point3D(p.X, 0, 0),
-            //    new Point3D(p.X, p.Y, 0),
-
-            //    new Point3D(p.X, p.Y, 0),
-            //    new Point3D(0, p.Y, 0),
-
-            //    new Point3D(0, p.Y, 0),
-            //    new Point3D(0, 0, 0)
-            //}
-            //    });
-
-            //    // top rectangle (z = p.Z)
-            //    view1.Children.Add(new LinesVisual3D
-            //    {
-            //        Color = Colors.Black,
-            //        Thickness = guideThickness,
-            //        Points = new Point3DCollection
-            //{
-            //    new Point3D(0, 0, p.Z),
-            //    new Point3D(p.X, 0, p.Z),
-
-            //    new Point3D(p.X, 0, p.Z),
-            //    new Point3D(p.X, p.Y, p.Z),
-
-            //    new Point3D(p.X, p.Y, p.Z),
-            //    new Point3D(0, p.Y, p.Z),
-
-            //    new Point3D(0, p.Y, p.Z),
-            //    new Point3D(0, 0, p.Z)
-            //}
-            //    });
-
-            //    // vertical edges
-            //    view1.Children.Add(new LinesVisual3D
-            //    {
-            //        Color = Colors.Black,
-            //        Thickness = guideThickness,
-            //        Points = new Point3DCollection
-            //{
-            //    new Point3D(0, 0, 0), new Point3D(0, 0, p.Z),
-            //    new Point3D(p.X, 0, 0), new Point3D(p.X, 0, p.Z),
-            //    new Point3D(p.X, p.Y, 0), new Point3D(p.X, p.Y, p.Z),
-            //    new Point3D(0, p.Y, 0), new Point3D(0, p.Y, p.Z)
-            //}
-            //    });
         }
 
 
@@ -345,56 +322,14 @@ namespace WpfAppThreeD
 
         private void btnSet_Click(object sender, RoutedEventArgs e)
         {
-            if (double.TryParse(txtX.Text, out double x) &&
-                double.TryParse(txtY.Text, out double y) &&
-                double.TryParse(txtZ.Text, out double z))
-            {
-                x = Math.Max(minX, Math.Min(maxX, x));
-                y = Math.Max(minY, Math.Min(maxY, y));
-                z = Math.Max(minZ, Math.Min(maxZ, z));
-
-                UpdatePoint(x, y, z);
-
-                // Sync sliders
-                sliderX.Value = x;
-                sliderY.Value = y;
-                sliderZ.Value = z;
-            }
+           
         }
-
-        private void btnSetRange_Click(object sender, RoutedEventArgs e)
-        {
-            if (double.TryParse(txtMinX.Text, out double newMinX) &&
-                double.TryParse(txtMaxX.Text, out double newMaxX) &&
-                double.TryParse(txtMinY.Text, out double newMinY) &&
-                double.TryParse(txtMaxY.Text, out double newMaxY) &&
-                double.TryParse(txtMinZ.Text, out double newMinZ) &&
-                double.TryParse(txtMaxZ.Text, out double newMaxZ))
-            {
-                // update ranges
-                minX = newMinX; maxX = newMaxX;
-                minY = newMinY; maxY = newMaxY;
-                minZ = newMinZ; maxZ = newMaxZ;
-
-                // redraw grid
-                DrawGrid();
-
-                // reset sliders
-                sliderX.Minimum = minX; sliderX.Maximum = maxX; sliderX.Value = 0;
-                sliderY.Minimum = minY; sliderY.Maximum = maxY; sliderY.Value = 0;
-                sliderZ.Minimum = minZ; sliderZ.Maximum = maxZ; sliderZ.Value = 0;
-
-                // reset sphere and guides to (0,0,0)
-                UpdatePoint(0, 0, 0);
-                AddPoint(0, 0, 0);
-            }
-        }
-
 
         
 
         private void view1_MouseMove(object sender, MouseEventArgs e)
         {
+            var x= pointSphere.Radius;
             if (isDragging && pointSphere != null)
             {
                 Point pos = e.GetPosition(view1);
@@ -448,49 +383,10 @@ namespace WpfAppThreeD
             }
         }
 
-        //private void view1_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-        //{
-        //    if (isDragging && pointSphere != null)
-        //    {
-        //        isDragging = false;
-
-        //        double step = 1;
-        //        double.TryParse(txtStep.Text, out step);
-
-        //        if (chkSnapToGrid.IsChecked == true)
-        //        {
-        //            double newX = GetSnappedValue(pointSphere.Center.X, step);
-        //            double newY = GetSnappedValue(pointSphere.Center.Y, step);
-        //            double newZ = GetSnappedValue(pointSphere.Center.Z, step);
-
-        //            UpdatePoint(newX, newY, newZ);
-        //            UpdateSphereLabel(new Point3D(newX, newY, newZ));
-
-        //            txtX.Text = newX.ToString("F2");
-        //            txtY.Text = newY.ToString("F2");
-        //            txtZ.Text = newZ.ToString("F2");
-
-        //            sliderX.Value = newX;
-        //            sliderY.Value = newY;
-        //            sliderZ.Value = newZ;
-        //        }
-        //    }
-        //}
 
         private void btnSetStep_Click(object sender, RoutedEventArgs e)
         {
-            DrawGrid();
-
-            //Restore the pointer sphere
-            if (pointSphere != null)
-                view1.Children.Add(pointSphere);
-
-            //Restore the coordinate label
-            if (coordLabel != null)
-                view1.Children.Add(coordLabel);
-
-            if (pointSphere != null)
-                DrawGuides(pointSphere.Center);
+           
 
         }
 
@@ -553,6 +449,74 @@ namespace WpfAppThreeD
             }
         }
 
+
+        private void txtPointerInput_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        {
+            if (double.TryParse(txtX.Text, out double x) &&
+               double.TryParse(txtY.Text, out double y) &&
+               double.TryParse(txtZ.Text, out double z))
+            {
+                x = Math.Max(minX, Math.Min(maxX, x));
+                y = Math.Max(minY, Math.Min(maxY, y));
+                z = Math.Max(minZ, Math.Min(maxZ, z));
+
+                UpdatePoint(x, y, z);
+
+                // Sync sliders
+                sliderX.Value = x;
+                sliderY.Value = y;
+                sliderZ.Value = z;
+            }
+        }
+
+        private void txtStep_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        {
+            if (double.TryParse(txtStep.Text, out double step) && step > 0)
+            {
+                DrawGrid();
+
+                // Restore the pointer sphere
+                if (pointSphere != null)
+                    view1.Children.Add(pointSphere);
+
+                // Restore the coordinate label
+                if (coordLabel != null)
+                    view1.Children.Add(coordLabel);
+
+                if (pointSphere != null)
+                    DrawGuides(pointSphere.Center);
+            }
+        }
+
+
+        private void txtRange_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        {
+            if (double.TryParse(txtMinX.Text, out double newMinX) &&
+               double.TryParse(txtMaxX.Text, out double newMaxX) &&
+               double.TryParse(txtMinY.Text, out double newMinY) &&
+               double.TryParse(txtMaxY.Text, out double newMaxY) &&
+               double.TryParse(txtMinZ.Text, out double newMinZ) &&
+               double.TryParse(txtMaxZ.Text, out double newMaxZ))
+            {
+                // update ranges
+                minX = newMinX; maxX = newMaxX;
+                minY = newMinY; maxY = newMaxY;
+                minZ = newMinZ; maxZ = newMaxZ;
+
+                // redraw grid
+                DrawGrid();
+
+                // reset sliders
+                sliderX.Minimum = minX; sliderX.Maximum = maxX; sliderX.Value = 0;
+                sliderY.Minimum = minY; sliderY.Maximum = maxY; sliderY.Value = 0;
+                sliderZ.Minimum = minZ; sliderZ.Maximum = maxZ; sliderZ.Value = 0;
+
+                // reset sphere and guides to (0,0,0)
+                UpdatePoint(0, 0, 0);
+                AddPoint(0, 0, 0);
+            }
+        }
+
         private void Slider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             if (pointSphere != null)
@@ -587,6 +551,46 @@ namespace WpfAppThreeD
             }
         }
 
+        private void sliderFontSize_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            int size = Math.Clamp((int)e.NewValue, int.Parse(txtFontMin.Text), int.Parse(txtFontMax.Text));
+
+            if (xLabel != null) xLabel.FontSize = size;
+            if (yLabel != null) yLabel.FontSize = size;
+            if (zLabel != null) zLabel.FontSize = size;
+            if (coordLabel != null) coordLabel.FontSize = size;
+
+            //DrawGrid();
+        }
+
+        private void txtFont_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (double.TryParse(txtFontMin.Text, out double min) &&
+                double.TryParse(txtFontMax.Text, out double max) &&
+                min < max)
+            {
+                sliderFontSize.Minimum = min;
+                sliderFontSize.Maximum = max;
+
+                // keep slider value within new bounds
+                if (sliderFontSize.Value < min) sliderFontSize.Value = min;
+                if (sliderFontSize.Value > max) sliderFontSize.Value = max;
+            }
+        }
+
+        private void txtPoint_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (double.TryParse(txtPointMin.Text, out double min) &&
+               double.TryParse(txtPointMax.Text, out double max) &&
+               min < max)
+            {
+                sliderPointSize.Minimum = min;
+                sliderPointSize.Maximum = max;
+
+                if (sliderPointSize.Value < min) sliderPointSize.Value = min;
+                if (sliderPointSize.Value > max) sliderPointSize.Value = max;
+            }
+        }
 
         private void SwitchCamera_Click(object sender, RoutedEventArgs e)
         {
@@ -631,9 +635,29 @@ namespace WpfAppThreeD
             isPerspective = !isPerspective;
         }
 
+        private void sliderPointSize_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            double size = Math.Clamp(e.NewValue, double.Parse(txtPointMin.Text), double.Parse(txtPointMax.Text));
+            if (pointSphere != null) pointSphere.Radius = size;
+        }
+
         private double GetSnappedValue(double value, double step)
         {
             return Math.Round(value / step) * step;
+        }
+
+        private void NumberValidationTextBox(object sender, TextCompositionEventArgs e)
+        {
+            // Allow only numbers
+            e.Handled = !int.TryParse(e.Text, out _);
+        }
+
+        private void txtMinMax_LostFocus(object sender, RoutedEventArgs e)
+        {
+            if (sender is TextBox tb && int.TryParse(tb.Text, out int value))
+            {
+                if (value < 5) tb.Text = "5"; // Enforce min size = 5
+            }
         }
 
     }
