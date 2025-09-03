@@ -66,19 +66,28 @@ namespace WpfAppThreeD
         }
 
 
+        private List<BillboardTextVisual3D> xTicks = new();
+        private List<BillboardTextVisual3D> yTicks = new();
+        private List<BillboardTextVisual3D> zTicks = new();
+
         private void DrawGrid()
         {
             view1.Children.Clear();
             view1.Children.Add(new DefaultLights());
 
-            double.TryParse(txtStep.Text, out double step); // <-- set from txtStep
+            double.TryParse(txtStep.Text, out double step);
 
+            // reset tick references
+            xTicks.Clear();
+            yTicks.Clear();
+            zTicks.Clear();
+
+            // ---------------- BOX ----------------
             var box = new LinesVisual3D { Color = Colors.Black, Thickness = 1.5 };
             Point3D p000 = new Point3D(minX, minY, minZ);
             Point3D p100 = new Point3D(maxX, minY, minZ);
             Point3D p010 = new Point3D(minX, maxY, minZ);
             Point3D p110 = new Point3D(maxX, maxY, minZ);
-
             Point3D p001 = new Point3D(minX, minY, maxZ);
             Point3D p101 = new Point3D(maxX, minY, maxZ);
             Point3D p011 = new Point3D(minX, maxY, maxZ);
@@ -150,7 +159,6 @@ namespace WpfAppThreeD
             view1.Children.Add(new LinesVisual3D { Color = Colors.Blue, Thickness = 2, Points = new Point3DCollection { new Point3D(0, 0, minZ), new Point3D(0, 0, maxZ) } });
 
             // ---------------- AXIS LABELS ----------------
-
             xLabel = new BillboardTextVisual3D
             {
                 Text = "X",
@@ -159,7 +167,6 @@ namespace WpfAppThreeD
                 FontSize = sliderFontSize.Value,
                 FontWeight = FontWeights.Bold
             };
-
             view1.Children.Add(xLabel);
 
             yLabel = new BillboardTextVisual3D
@@ -170,7 +177,6 @@ namespace WpfAppThreeD
                 FontSize = sliderFontSize.Value,
                 FontWeight = FontWeights.Bold
             };
-
             view1.Children.Add(yLabel);
 
             zLabel = new BillboardTextVisual3D
@@ -187,19 +193,31 @@ namespace WpfAppThreeD
             for (double x = minX; x <= maxX; x += step)
             {
                 view1.Children.Add(new LinesVisual3D { Color = Colors.Red, Points = new Point3DCollection { new Point3D(x, -0.1, 0), new Point3D(x, 0.1, 0) } });
-                view1.Children.Add(new BillboardTextVisual3D { Text = x.ToString("0.###"), Position = new Point3D(x, -0.3, 0), Foreground = Brushes.Red,FontSize= sliderFontSize.Value });
+                var tick = new BillboardTextVisual3D { Text = x.ToString("0.###"), Position = new Point3D(x, -0.3, 0), Foreground = Brushes.Red, FontSize = sliderFontSize.Value };
+                view1.Children.Add(tick);
+                xTicks.Add(tick);
             }
             for (double y = minY; y <= maxY; y += step)
             {
                 view1.Children.Add(new LinesVisual3D { Color = Colors.Green, Points = new Point3DCollection { new Point3D(-0.1, y, 0), new Point3D(0.1, y, 0) } });
-                view1.Children.Add(new BillboardTextVisual3D { Text = y.ToString("0.###"), Position = new Point3D(-0.3, y, 0), Foreground = Brushes.Green,FontSize= sliderFontSize.Value });
+                var tick = new BillboardTextVisual3D { Text = y.ToString("0.###"), Position = new Point3D(-0.3, y, 0), Foreground = Brushes.Green, FontSize = sliderFontSize.Value };
+                view1.Children.Add(tick);
+                yTicks.Add(tick);
             }
             for (double z = minZ; z <= maxZ; z += step)
             {
                 view1.Children.Add(new LinesVisual3D { Color = Colors.Blue, Points = new Point3DCollection { new Point3D(0, -0.1, z), new Point3D(0, 0.1, z) } });
-                view1.Children.Add(new BillboardTextVisual3D { Text = z.ToString("0.###"), Position = new Point3D(0, -0.3, z), Foreground = Brushes.Blue,FontSize= sliderFontSize.Value });
+                var tick = new BillboardTextVisual3D { Text = z.ToString("0.###"), Position = new Point3D(0, -0.3, z), Foreground = Brushes.Blue, FontSize = sliderFontSize.Value };
+                view1.Children.Add(tick);
+                zTicks.Add(tick);
             }
+
+            // ---------------- RE-ADD POINTER + LABEL ----------------
+            if (pointSphere != null) view1.Children.Add(pointSphere);
+            if (coordLabel != null) view1.Children.Add(coordLabel);
+            if (pointSphere != null) DrawGuides(pointSphere.Center);
         }
+
 
 
         private void DrawGuides(Point3D p)
@@ -476,11 +494,11 @@ namespace WpfAppThreeD
                 DrawGrid();
 
                 // Restore the pointer sphere
-                if (pointSphere != null)
+                if (pointSphere != null && !view1.Children.Contains(pointSphere))
                     view1.Children.Add(pointSphere);
 
                 // Restore the coordinate label
-                if (coordLabel != null)
+                if (coordLabel != null && !view1.Children.Contains(coordLabel))
                     view1.Children.Add(coordLabel);
 
                 if (pointSphere != null)
@@ -512,6 +530,7 @@ namespace WpfAppThreeD
                 sliderZ.Minimum = minZ; sliderZ.Maximum = maxZ; sliderZ.Value = 0;
 
                 // reset sphere and guides to (0,0,0)
+                
                 UpdatePoint(0, 0, 0);
                 AddPoint(0, 0, 0);
             }
@@ -559,6 +578,10 @@ namespace WpfAppThreeD
             if (yLabel != null) yLabel.FontSize = size;
             if (zLabel != null) zLabel.FontSize = size;
             if (coordLabel != null) coordLabel.FontSize = size;
+
+            foreach (var tick in xTicks) tick.FontSize = size;
+            foreach (var tick in yTicks) tick.FontSize = size;
+            foreach (var tick in zTicks) tick.FontSize = size;
 
             //DrawGrid();
         }
