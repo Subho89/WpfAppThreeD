@@ -1,5 +1,6 @@
 ﻿using HelixToolkit.Wpf;
 using System;
+using System.Reflection;
 using System.Reflection.Emit;
 using System.Windows;
 using System.Windows.Controls;
@@ -323,18 +324,22 @@ namespace WpfAppThreeD
 
         private void UpdatePoint(double x, double y, double z)
         {
-            //if (pointSphere != null)
-            //{
-            //    ((SphereVisual3D)pointSphere).Center = new Point3D(x, y, z);
-            //}
-
             if (pointSphere != null)
             {
                 ((SphereVisual3D)pointSphere).Center = new Point3D(x, y, z);
 
-                // draw guides right after update
+                // Draw guides right after update
                 DrawGuides(new Point3D(x, y, z));
 
+                // Update UI fields with new coordinates
+                txtX.Text = x.ToString("0.###");
+                txtX.CaretIndex = txtX.Text.Length; // ✅ Move cursor after text
+
+                txtY.Text = y.ToString("0.###");
+                txtY.CaretIndex = txtY.Text.Length; // ✅ Move cursor after text
+
+                txtZ.Text = z.ToString("0.###");
+                txtZ.CaretIndex = txtZ.Text.Length;
             }
         }
 
@@ -486,6 +491,8 @@ namespace WpfAppThreeD
                 sliderZ.Value = z;
             }
         }
+
+        
 
         private void txtStep_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
         {

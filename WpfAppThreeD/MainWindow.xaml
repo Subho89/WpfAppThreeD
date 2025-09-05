@@ -11,9 +11,10 @@
             <!-- Two column layout -->
             <Grid Margin="5">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <!-- Equal width -->
-                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="7*"/>
+                    <!-- 70% -->
+                    <ColumnDefinition Width="3*"/>
+                    <!-- 30% -->
                 </Grid.ColumnDefinitions>
 
                 <!-- Left Column : XYZ + Step + View inside GroupBox -->               
@@ -29,10 +30,11 @@
                             <StackPanel Orientation="Vertical" Margin="10">
                                 <!-- X Axis -->
                                 <StackPanel Orientation="Horizontal" Margin="5">
+                                    <Button Content="..." Width="25" Height="22" Margin="0,0,12,0" VerticalAlignment="Center" />
                                     <TextBlock Text="X:" Width="20" VerticalAlignment="Center"/>
                                     <TextBox x:Name="txtMinX" Width="50" Text="-10" VerticalAlignment="Center" Margin="5,0" />
-                                    <Slider x:Name="sliderX" Width="200" Minimum="-10" Maximum="10" Value="0"
-                ValueChanged="Slider_ValueChanged" Margin="5,0"/>
+                                    <Slider x:Name="sliderX" Width="300" Minimum="-10" Maximum="10" Value="0"
+            ValueChanged="Slider_ValueChanged" Margin="5,0"/>
                                     <TextBox x:Name="txtMaxX" Width="50" Text="10" VerticalAlignment="Center" Margin="5,0" />
                                     <TextBlock Text="X Coordinates:" VerticalAlignment="Center"/>
                                     <TextBox x:Name="txtX" Width="50" Text="0" Margin="5,0"/>
@@ -40,10 +42,11 @@
 
                                 <!-- Y Axis -->
                                 <StackPanel Orientation="Horizontal" Margin="5">
+                                    <Button Content="..." Width="25" Height="22" Margin="0,0,12,0" VerticalAlignment="Center" />
                                     <TextBlock Text="Y:" Width="20" VerticalAlignment="Center"/>
                                     <TextBox x:Name="txtMinY" Width="50" Text="-10" VerticalAlignment="Center" Margin="5,0" />
-                                    <Slider x:Name="sliderY" Width="200" Minimum="-10" Maximum="10" Value="0"
-                ValueChanged="Slider_ValueChanged" Margin="5,0"/>
+                                    <Slider x:Name="sliderY" Width="300" Minimum="-10" Maximum="10" Value="0"
+            ValueChanged="Slider_ValueChanged" Margin="5,0"/>
                                     <TextBox x:Name="txtMaxY" Width="50" Text="10" VerticalAlignment="Center" Margin="5,0" />
                                     <TextBlock Text="Y Coordinates:" VerticalAlignment="Center"/>
                                     <TextBox x:Name="txtY" Width="50" Text="0" Margin="5,0"/>
@@ -51,10 +54,11 @@
 
                                 <!-- Z Axis -->
                                 <StackPanel Orientation="Horizontal" Margin="5">
+                                    <Button Content="..." Width="25" Height="22" Margin="0,0,12,0" VerticalAlignment="Center" />
                                     <TextBlock Text="Z:" Width="20" VerticalAlignment="Center"/>
                                     <TextBox x:Name="txtMinZ" Width="50" Text="-10" VerticalAlignment="Center" Margin="5,0" />
-                                    <Slider x:Name="sliderZ" Width="200" Minimum="-10" Maximum="10" Value="0"
-                ValueChanged="Slider_ValueChanged" Margin="5,0"/>
+                                    <Slider x:Name="sliderZ" Width="300" Minimum="-10" Maximum="10" Value="0"
+            ValueChanged="Slider_ValueChanged" Margin="5,0"/>
                                     <TextBox x:Name="txtMaxZ" Width="50" Text="10" VerticalAlignment="Center" Margin="5,0" />
                                     <TextBlock Text="Z Coordinates:" VerticalAlignment="Center"/>
                                     <TextBox x:Name="txtZ" Width="50" Text="0" Margin="5,0"/>
