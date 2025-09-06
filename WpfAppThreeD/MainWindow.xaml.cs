@@ -1,7 +1,9 @@
 ﻿using HelixToolkit.Wpf;
 using System;
+using System.Globalization;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -28,6 +30,8 @@ namespace WpfAppThreeD
         private BillboardTextVisual3D xLabel, yLabel, zLabel;
 
         private bool isPerspective = true;
+
+        private bool isUpdatingUI = false;
 
         public MainWindow()
         {
@@ -326,29 +330,33 @@ namespace WpfAppThreeD
         {
             if (pointSphere != null)
             {
-                ((SphereVisual3D)pointSphere).Center = new Point3D(x, y, z);
-
-                // Draw guides right after update
+                pointSphere.Center = new Point3D(x, y, z);
                 DrawGuides(new Point3D(x, y, z));
 
-                // Update UI fields with new coordinates
+                isUpdatingUI = true; // prevent recursive TextChanged
+                
+                //txtX.Text = x.ToString("0.###");
                 txtX.Text = x.ToString("0.###");
-                txtX.CaretIndex = txtX.Text.Length; // ✅ Move cursor after text
+                txtX.CaretIndex = txtX.Text.Length;
 
                 txtY.Text = y.ToString("0.###");
-                txtY.CaretIndex = txtY.Text.Length; // ✅ Move cursor after text
+                txtY.CaretIndex = txtY.Text.Length;
 
                 txtZ.Text = z.ToString("0.###");
                 txtZ.CaretIndex = txtZ.Text.Length;
+
+                isUpdatingUI = false;
             }
         }
 
-        private void btnSet_Click(object sender, RoutedEventArgs e)
+
+        private void TextBox_PreviewKeyDown(object sender, KeyEventArgs e)
         {
-           
+            // Block space
+            //if (e.Key == Key.Space) e.Handled = true;
         }
 
-        
+
 
         private void view1_MouseMove(object sender, MouseEventArgs e)
         {
@@ -473,26 +481,65 @@ namespace WpfAppThreeD
         }
 
 
-        private void txtPointerInput_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        //private void txtPointerInput_TextChanged(object sender, TextChangedEventArgs e)
+        //{
+        //    if (isUpdatingUI) return; // ignore programmatic changes
+
+        //    if (double.TryParse(txtX.Text, out double x) &&
+        //        double.TryParse(txtY.Text, out double y) &&
+        //        double.TryParse(txtZ.Text, out double z))
+        //    {
+        //        x = Math.Max(minX, Math.Min(maxX, x));
+        //        y = Math.Max(minY, Math.Min(maxY, y));
+        //        z = Math.Max(minZ, Math.Min(maxZ, z));
+
+        //        UpdatePoint(x, y, z);
+
+        //        sliderX.Value = x;
+        //        sliderY.Value = y;
+        //        sliderZ.Value = z;
+        //    }
+        //}
+
+        private void txtPointerInput_TextChanged(object sender, TextChangedEventArgs e)
         {
-            if (double.TryParse(txtX.Text, out double x) &&
-               double.TryParse(txtY.Text, out double y) &&
-               double.TryParse(txtZ.Text, out double z))
+            if (isUpdatingUI) return; // ignore programmatic changes
+
+            TextBox tb = sender as TextBox;
+            if (tb == null) return;
+
+            string text = tb.Text;
+
+            // Allow intermediate states like "0.", "-", ".", "-."
+            if (string.IsNullOrEmpty(text) || text == "-" || text.EndsWith("."))
+                return;
+
+            if (double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out double value))
             {
+                double x = sliderX.Value;
+                double y = sliderY.Value; 
+                double z = sliderZ.Value; 
+
+                if (tb == txtX) x = value;
+                if (tb == txtY) y = value;
+                if (tb == txtZ) z = value;
+
+                // clamp
                 x = Math.Max(minX, Math.Min(maxX, x));
                 y = Math.Max(minY, Math.Min(maxY, y));
                 z = Math.Max(minZ, Math.Min(maxZ, z));
 
                 UpdatePoint(x, y, z);
 
-                // Sync sliders
                 sliderX.Value = x;
                 sliderY.Value = y;
                 sliderZ.Value = z;
             }
         }
 
-        
+
+
+
 
         private void txtStep_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
         {
@@ -678,8 +725,16 @@ namespace WpfAppThreeD
 
         private void NumberValidationTextBox(object sender, TextCompositionEventArgs e)
         {
-            // Allow only numbers
-            e.Handled = !int.TryParse(e.Text, out _);
+            //// Allow only numbers
+            //e.Handled = !int.TryParse(e.Text, out _);
+
+            TextBox textBox = sender as TextBox;
+
+            // simulate what the text will look like after input
+            string newText = textBox.Text.Insert(textBox.CaretIndex, e.Text);
+
+            Regex regex = new Regex(@"^-?\d*\.?\d*$");
+            e.Handled = !regex.IsMatch(newText);
         }
 
         private void txtMinMax_LostFocus(object sender, RoutedEventArgs e)
