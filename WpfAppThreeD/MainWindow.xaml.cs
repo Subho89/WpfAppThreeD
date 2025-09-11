@@ -9,6 +9,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Media3D;
+using NCalc;
 
 namespace WpfAppThreeD
 {
@@ -336,14 +337,14 @@ namespace WpfAppThreeD
                 isUpdatingUI = true; // prevent recursive TextChanged
                 
                 //txtX.Text = x.ToString("0.###");
-                txtX.Text = x.ToString("0.###");
-                txtX.CaretIndex = txtX.Text.Length;
+                txtCoordinateX.Text = x.ToString("0.###");
+                txtCoordinateX.CaretIndex = txtCoordinateX.Text.Length;
 
-                txtY.Text = y.ToString("0.###");
-                txtY.CaretIndex = txtY.Text.Length;
+                txtCoordinateY.Text = y.ToString("0.###");
+                txtCoordinateY.CaretIndex = txtCoordinateY.Text.Length;
 
-                txtZ.Text = z.ToString("0.###");
-                txtZ.CaretIndex = txtZ.Text.Length;
+                txtCoordinateZ.Text = z.ToString("0.###");
+                txtCoordinateZ.CaretIndex = txtCoordinateZ.Text.Length;
 
                 isUpdatingUI = false;
             }
@@ -529,6 +530,14 @@ namespace WpfAppThreeD
                 y = Math.Max(minY, Math.Min(maxY, y));
                 z = Math.Max(minZ, Math.Min(maxZ, z));
 
+                ApplyExpressionToX();
+                ApplyExpressionToY();
+                ApplyExpressionToZ();
+
+                x = Convert.ToDouble(txtCoordinateX.Text);
+                y = Convert.ToDouble(txtCoordinateY.Text);
+                z = Convert.ToDouble(txtCoordinateZ.Text);
+
                 UpdatePoint(x, y, z);
 
                 sliderX.Value = x;
@@ -587,6 +596,9 @@ namespace WpfAppThreeD
                 
                 UpdatePoint(0, 0, 0);
                 AddPoint(0, 0, 0);
+                txtX.Text = "0";
+                txtY.Text = "0";
+                txtZ.Text = "0";
             }
         }
 
@@ -618,9 +630,9 @@ namespace WpfAppThreeD
                 UpdatePoint(newX, newY, newZ);
                 UpdateSphereLabel(new Point3D(newX, newY, newZ));
 
-                txtX.Text = newX.ToString("F2");
-                txtY.Text = newY.ToString("F2");
-                txtZ.Text = newZ.ToString("F2");
+                txtCoordinateX.Text = newX.ToString("F2");
+                txtCoordinateY.Text = newY.ToString("F2");
+                txtCoordinateZ.Text = newZ.ToString("F2");
             }
         }
 
@@ -744,6 +756,228 @@ namespace WpfAppThreeD
                 if (value < 5) tb.Text = "5"; // Enforce min size = 5
             }
         }
+
+        private void BtnSetXRange_Click(object sender, RoutedEventArgs e)
+        {
+            if (double.TryParse(txtMinX.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out double min) &&
+                double.TryParse(txtMaxX.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out double max))
+            {
+                var dlg = new RangeDialog(min, max, "X") { Owner = this };
+                if (dlg.ShowDialog() == true)
+                {
+                    // Update min/max values
+                    txtMinX.Text = dlg.MinValue.ToString(CultureInfo.InvariantCulture);
+                    txtMaxX.Text = dlg.MaxValue.ToString(CultureInfo.InvariantCulture);
+                    sliderX.Minimum = dlg.MinValue;
+                    sliderX.Maximum = dlg.MaxValue;
+                    txtXExp.Text = dlg.Expression;
+                    // Save rounding / digits / expression
+                    ApplyRangeSettings("X", dlg);
+
+                    // Get current coordinates
+                    double x = pointSphere.Center.X;
+                    double y = pointSphere.Center.Y;
+                    double z = pointSphere.Center.Z;
+
+
+                    // Apply the expression immediately
+                    ApplyExpressionToX();
+                    x = Convert.ToDouble(txtCoordinateX.Text);
+                    // Update the pointer
+                    UpdatePoint(x, y, z);
+                    UpdateSphereLabel(new Point3D(x, y, z));
+                }
+            }
+        }
+
+        private void BtnSetYRange_Click(object sender, RoutedEventArgs e)
+        {
+            if (double.TryParse(txtMinY.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out double min) &&
+                double.TryParse(txtMaxY.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out double max))
+            {
+                var dlg = new RangeDialog(min, max,"Y") { Owner = this };
+                if (dlg.ShowDialog() == true)
+                {
+                    // Update min/max values
+                    txtMinY.Text = dlg.MinValue.ToString(CultureInfo.InvariantCulture);
+                    txtMaxY.Text = dlg.MaxValue.ToString(CultureInfo.InvariantCulture);
+                    sliderY.Minimum = dlg.MinValue;
+                    sliderY.Maximum = dlg.MaxValue;
+                    txtYExp.Text = dlg.Expression;
+                    // Save rounding / digits / expression
+                    ApplyRangeSettings("Y", dlg);
+
+                    // Get current coordinates
+                    double x = pointSphere.Center.X;
+                    double y = pointSphere.Center.Y;
+                    double z = pointSphere.Center.Z;
+
+
+                    // Apply the expression immediately
+                    ApplyExpressionToY();
+                    y = Convert.ToDouble(txtCoordinateY.Text);
+                    // Update the pointer
+                    UpdatePoint(x, y, z);
+                    UpdateSphereLabel(new Point3D(x, y, z));
+                }
+            }
+        }
+
+        private void BtnSetZRange_Click(object sender, RoutedEventArgs e)
+        {
+            if (double.TryParse(txtMinZ.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out double min) &&
+                double.TryParse(txtMaxZ.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out double max))
+            {
+                var dlg = new RangeDialog(min, max,"Z") { Owner = this };
+                if (dlg.ShowDialog() == true)
+                {
+                    // Update min/max values
+                    txtMinZ.Text = dlg.MinValue.ToString(CultureInfo.InvariantCulture);
+                    txtMaxZ.Text = dlg.MaxValue.ToString(CultureInfo.InvariantCulture);
+                    sliderZ.Minimum = dlg.MinValue;
+                    sliderZ.Maximum = dlg.MaxValue;
+                    txtZExp.Text = dlg.Expression;
+
+
+                    // Save rounding / digits / expression
+                    ApplyRangeSettings("Z", dlg);
+
+                    // Get current coordinates
+                    double x = pointSphere.Center.X;
+                    double y = pointSphere.Center.Y;
+                    double z = pointSphere.Center.Z;
+                    
+
+                    // Apply the expression immediately
+                    ApplyExpressionToZ();
+                    z=Convert.ToDouble(txtCoordinateZ.Text);
+                    // Update the pointer
+                    UpdatePoint(x, y, z);
+                    UpdateSphereLabel(new Point3D(x, y, z));
+                }
+            }
+        }
+
+        /// <summary>
+        /// Store additional settings returned from RangeDialog
+        /// </summary>
+        private void ApplyRangeSettings(string axis, RangeDialog dlg)
+        {
+            // Example: You could store them in dictionaries if you want per-axis configs
+            // For now, just showing how to capture them
+            var rounding = dlg.SelectedMode;
+            var digits = dlg.Digits;
+            var expr = dlg.Expression;
+
+            // Debug or apply logic later
+            Console.WriteLine($"Axis={axis}, Mode={rounding}, Digits={digits}, Expression={expr}");
+        }
+
+        private void ApplyExpressionToX()
+        {
+            if (double.TryParse(txtX.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out double originalX))
+            {
+                string expression = txtXExp.Text;
+
+                if (!string.IsNullOrWhiteSpace(expression))
+                {
+                    try
+                    {
+                        var exp = new NCalc.Expression(expression);
+                        exp.Parameters["X"] = originalX;
+                        exp.Parameters["Y"] = pointSphere.Center.Y;
+                        exp.Parameters["Z"] = pointSphere.Center.Z;
+
+                        var result = exp.Evaluate();
+
+                        if (result is double d)
+                            txtCoordinateX.Text = d.ToString("0.###", CultureInfo.InvariantCulture);
+                        else
+                            txtCoordinateX.Text = result.ToString();
+                    }
+                    catch (Exception ex)
+                    {
+                        txtCoordinateX.Text = "ERR";
+                        Console.WriteLine($"Expression error in X: {ex.Message}");
+                    }
+                }
+                else
+                {
+                    txtCoordinateX.Text = originalX.ToString("0.###", CultureInfo.InvariantCulture);
+                }
+            }
+        }
+
+        private void ApplyExpressionToY()
+        {
+            if (double.TryParse(txtY.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out double originalY))
+            {
+                string expression = txtYExp.Text;
+
+                if (!string.IsNullOrWhiteSpace(expression))
+                {
+                    try
+                    {
+                        var exp = new NCalc.Expression(expression);
+                        exp.Parameters["X"] = pointSphere.Center.X;
+                        exp.Parameters["Y"] = originalY;
+                        exp.Parameters["Z"] = pointSphere.Center.Z;
+
+                        var result = exp.Evaluate();
+
+                        if (result is double d)
+                            txtCoordinateY.Text = d.ToString("0.###", CultureInfo.InvariantCulture);
+                        else
+                            txtCoordinateY.Text = result.ToString();
+                    }
+                    catch (Exception ex)
+                    {
+                        txtCoordinateY.Text = "ERR";
+                        Console.WriteLine($"Expression error in Y: {ex.Message}");
+                    }
+                }
+                else
+                {
+                    txtCoordinateY.Text = originalY.ToString("0.###", CultureInfo.InvariantCulture);
+                }
+            }
+        }
+
+        private void ApplyExpressionToZ()
+        {
+            if (double.TryParse(txtZ.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out double originalZ))
+            {
+                string expression = txtZExp.Text;
+
+                if (!string.IsNullOrWhiteSpace(expression))
+                {
+                    try
+                    {
+                        var exp = new NCalc.Expression(expression);
+                        exp.Parameters["X"] = pointSphere.Center.X;
+                        exp.Parameters["Y"] = pointSphere.Center.Y;
+                        exp.Parameters["Z"] = originalZ;
+
+                        var result = exp.Evaluate();
+
+                        if (result is double d)
+                            txtCoordinateZ.Text = d.ToString("0.###", CultureInfo.InvariantCulture);
+                        else
+                            txtCoordinateZ.Text = result.ToString();
+                    }
+                    catch (Exception ex)
+                    {
+                        txtCoordinateZ.Text = "ERR";
+                        Console.WriteLine($"Expression error in Z: {ex.Message}");
+                    }
+                }
+                else
+                {
+                    txtCoordinateZ.Text = originalZ.ToString("0.###", CultureInfo.InvariantCulture);
+                }
+            }
+        }
+
 
     }
 }

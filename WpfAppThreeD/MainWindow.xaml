@@ -17,76 +17,90 @@
                     <!-- 30% -->
                 </Grid.ColumnDefinitions>
 
-                <!-- Left Column : XYZ + Step + View inside GroupBox -->               
+                <!-- Left Column : XYZ + Step + View inside GroupBox -->
 
                 <GroupBox Header="Axis Controls" Grid.Column="0" Margin="5,5,5,0">
-                    <Grid Margin="10">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+                        <Grid Margin="10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
 
-                        <!-- LEFT COLUMN: XYZ, Step, Snap, Camera -->
-                        <StackPanel Orientation="Vertical" Margin="5" Grid.Column="0">
-                            <StackPanel Orientation="Vertical" Margin="10">
-                                <!-- X Axis -->
-                                <StackPanel Orientation="Horizontal" Margin="5">
-                                    <Button Content="..." Width="25" Height="22" Margin="0,0,12,0" VerticalAlignment="Center" />
-                                    <TextBlock Text="X:" Width="20" VerticalAlignment="Center"/>
-                                    <TextBox x:Name="txtMinX" Width="50" Text="-10" VerticalAlignment="Center" Margin="5,0" PreviewTextInput="NumberValidationTextBox"
-         PreviewKeyDown="TextBox_PreviewKeyDown"/>
-                                    <Slider x:Name="sliderX" Width="300" Minimum="-10" Maximum="10" Value="0"
-            ValueChanged="Slider_ValueChanged" Margin="5,0"/>
-                                    <TextBox x:Name="txtMaxX" Width="50" Text="10" VerticalAlignment="Center" Margin="5,0" PreviewTextInput="NumberValidationTextBox"
-         PreviewKeyDown="TextBox_PreviewKeyDown"/>
-                                    <TextBlock Text="X Coordinates:" VerticalAlignment="Center"/>
-                                    <TextBox x:Name="txtX" Width="50" Text="0" Margin="5,0" PreviewTextInput="NumberValidationTextBox"
-         PreviewKeyDown="TextBox_PreviewKeyDown"/>
+                            <!-- LEFT COLUMN: XYZ, Step, Snap, Camera -->
+                            <StackPanel Orientation="Vertical" Margin="5" Grid.Column="0">
+                                <StackPanel Orientation="Vertical" Margin="10">
+
+                                    <!-- X Axis -->
+                                    <StackPanel Orientation="Horizontal" Margin="5">
+                                        <Button Content="..." Width="25" Height="22" Margin="0,0,12,0"
+                                VerticalAlignment="Center" Click="BtnSetXRange_Click"/>
+                                        <TextBlock Text="X:" Width="20" VerticalAlignment="Center"/>
+                                        <TextBox x:Name="txtMinX" Width="50" Text="-10" VerticalAlignment="Center" Margin="5,0"
+                                 PreviewTextInput="NumberValidationTextBox" PreviewKeyDown="TextBox_PreviewKeyDown"/>
+                                        <Slider x:Name="sliderX" Width="300" Minimum="-10" Maximum="10" Value="0"
+                                ValueChanged="Slider_ValueChanged" Margin="5,0"/>
+                                        <TextBox x:Name="txtMaxX" Width="50" Text="10" VerticalAlignment="Center" Margin="5,0"
+                                 PreviewTextInput="NumberValidationTextBox" PreviewKeyDown="TextBox_PreviewKeyDown"/>
+                                        <TextBlock Text="X Value:" VerticalAlignment="Center"/>
+                                        <TextBox x:Name="txtX" Width="50" Text="0" Margin="5,0"
+                                 PreviewTextInput="NumberValidationTextBox" PreviewKeyDown="TextBox_PreviewKeyDown"/>
+                                        <TextBlock Text="X Expression:" VerticalAlignment="Center"/>
+                                        <TextBox x:Name="txtXExp" Width="80" Text="" Margin="5,0" IsReadOnly="True"/>
+                                        <TextBlock Text="X Coordinates:" VerticalAlignment="Center"/>
+                                        <TextBox x:Name="txtCoordinateX" Width="80" Text="0" Margin="5,0" IsReadOnly="True"/>
+                                    </StackPanel>
+
+                                    <!-- Y Axis -->
+                                    <StackPanel Orientation="Horizontal" Margin="5">
+                                        <Button Content="..." Width="25" Height="22" Margin="0,0,12,0"
+                                VerticalAlignment="Center" Click="BtnSetYRange_Click"/>
+                                        <TextBlock Text="Y:" Width="20" VerticalAlignment="Center"/>
+                                        <TextBox x:Name="txtMinY" Width="50" Text="-10" VerticalAlignment="Center" Margin="5,0"
+                                 PreviewTextInput="NumberValidationTextBox"/>
+                                        <Slider x:Name="sliderY" Width="300" Minimum="-10" Maximum="10" Value="0"
+                                ValueChanged="Slider_ValueChanged" Margin="5,0"/>
+                                        <TextBox x:Name="txtMaxY" Width="50" Text="10" VerticalAlignment="Center" Margin="5,0"
+                                 PreviewTextInput="NumberValidationTextBox"/>
+                                        <TextBlock Text="Y Value:" VerticalAlignment="Center"/>
+                                        <TextBox x:Name="txtY" Width="50" Text="0" Margin="5,0"
+                                 PreviewTextInput="NumberValidationTextBox"/>
+                                        <TextBlock Text="Y Expression:" VerticalAlignment="Center"/>
+                                        <TextBox x:Name="txtYExp" Width="80" Text="" Margin="5,0" IsReadOnly="True"/>
+                                        <TextBlock Text="Y Coordinates:" VerticalAlignment="Center"/>
+                                        <TextBox x:Name="txtCoordinateY" Width="80" Text="0" Margin="5,0" IsReadOnly="True"/>
+                                    </StackPanel>
+
+                                    <!-- Z Axis -->
+                                    <StackPanel Orientation="Horizontal" Margin="5">
+                                        <Button Content="..." Width="25" Height="22" Margin="0,0,12,0"
+                                VerticalAlignment="Center" Click="BtnSetZRange_Click"/>
+                                        <TextBlock Text="Z:" Width="20" VerticalAlignment="Center"/>
+                                        <TextBox x:Name="txtMinZ" Width="50" Text="-10" VerticalAlignment="Center" Margin="5,0"
+                                 PreviewTextInput="NumberValidationTextBox"/>
+                                        <Slider x:Name="sliderZ" Width="300" Minimum="-10" Maximum="10" Value="0"
+                                ValueChanged="Slider_ValueChanged" Margin="5,0"/>
+                                        <TextBox x:Name="txtMaxZ" Width="50" Text="10" VerticalAlignment="Center" Margin="5,0"
+                                 PreviewTextInput="NumberValidationTextBox"/>
+                                        <TextBlock Text="Z Value:" VerticalAlignment="Center"/>
+                                        <TextBox x:Name="txtZ" Width="50" Text="0" Margin="5,0"
+                                 PreviewTextInput="NumberValidationTextBox"/>
+                                        <TextBlock Text="Z Expression:" VerticalAlignment="Center"/>
+                                        <TextBox x:Name="txtZExp" Width="80" Text="" Margin="5,0" IsReadOnly="True"/>
+                                        <TextBlock Text="Z Coordinates:" VerticalAlignment="Center"/>
+                                        <TextBox x:Name="txtCoordinateZ" Width="80" Text="0" Margin="5,0" IsReadOnly="True"/>
+                                    </StackPanel>
+
                                 </StackPanel>
-
-                                <!-- Y Axis -->
-                                <StackPanel Orientation="Horizontal" Margin="5">
-                                    <Button Content="..." Width="25" Height="22" Margin="0,0,12,0" VerticalAlignment="Center" />
-                                    <TextBlock Text="Y:" Width="20" VerticalAlignment="Center"/>
-                                    <TextBox x:Name="txtMinY" Width="50" Text="-10" VerticalAlignment="Center" Margin="5,0" PreviewTextInput="NumberValidationTextBox"
-         />
-                                    <Slider x:Name="sliderY" Width="300" Minimum="-10" Maximum="10" Value="0"
-            ValueChanged="Slider_ValueChanged" Margin="5,0"/>
-                                    <TextBox x:Name="txtMaxY" Width="50" Text="10" VerticalAlignment="Center" Margin="5,0" PreviewTextInput="NumberValidationTextBox"
-         />
-                                    <TextBlock Text="Y Coordinates:" VerticalAlignment="Center"/>
-                                    <TextBox x:Name="txtY" Width="50" Text="0" Margin="5,0" PreviewTextInput="NumberValidationTextBox"
-         />
-                                </StackPanel>
-
-                                <!-- Z Axis -->
-                                <StackPanel Orientation="Horizontal" Margin="5">
-                                    <Button Content="..." Width="25" Height="22" Margin="0,0,12,0" VerticalAlignment="Center" />
-                                    <TextBlock Text="Z:" Width="20" VerticalAlignment="Center"/>
-                                    <TextBox x:Name="txtMinZ" Width="50" Text="-10" VerticalAlignment="Center" Margin="5,0" PreviewTextInput="NumberValidationTextBox"
-         />
-                                    <Slider x:Name="sliderZ" Width="300" Minimum="-10" Maximum="10" Value="0"
-            ValueChanged="Slider_ValueChanged" Margin="5,0"/>
-                                    <TextBox x:Name="txtMaxZ" Width="50" Text="10" VerticalAlignment="Center" Margin="5,0" PreviewTextInput="NumberValidationTextBox" />
-                                    <TextBlock Text="Z Coordinates:" VerticalAlignment="Center"/>
-                                    <TextBox x:Name="txtZ" Width="50" Text="0" Margin="5,0" PreviewTextInput="NumberValidationTextBox" />
-                                </StackPanel>
-
-                                <!-- Apply Button -->
-                                <!--<Button x:Name="btnSetRange" Content="Apply Ranges" Width="120" Margin="5"/>-->
                             </StackPanel>
-                            <!-- XYZ Input -->
-
-                            
-                        </StackPanel>
-
-                        <!-- RIGHT COLUMN: Sliders with Min/Max -->
-                        
-                    </Grid>
+                        </Grid>
+                    </ScrollViewer>
                 </GroupBox>
+
 
 
                 <!-- Right Column : Axis Controls -->
                 <GroupBox Header="View Controls" Grid.Column="1" Margin="5,5,5,0">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
                     <StackPanel Orientation="Vertical" Margin="5" Grid.Column="1">
 
                         <!-- Font Size -->
@@ -142,6 +156,7 @@ TickFrequency="0.1" IsSnapToTickEnabled="false" Margin="5,0"/>
                         </StackPanel>
 
                     </StackPanel>
+                    </ScrollViewer>
                 </GroupBox>
             </Grid>
         </StackPanel>
