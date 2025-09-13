@@ -502,48 +502,67 @@ namespace WpfAppThreeD
         {
             if (!sliderUpdating)
             {
-                txtUpdating = true; 
-                if (isUpdatingUI) 
+                txtUpdating = true;
+                if (isUpdatingUI)
                     return; // ignore programmatic changes
-                TextBox tb = sender as TextBox; 
-                if (tb == null) return; string text = tb.Text; // Allow intermediate states like "0.", "-", ".", "-."
-                if (string.IsNullOrEmpty(text) || text == "-" || text.EndsWith(".")) 
-                    return; 
-                if (double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out double value)) 
-                { 
-                    double x = sliderX.Value; 
-                    double y = sliderY.Value; 
-                    double z = sliderZ.Value; 
-                    if (tb == txtX) x = value; 
-                    if (tb == txtY) y = value; 
-                    if (tb == txtZ) z = value; 
-                    // clamp
-                    x = Math.Max(minX, Math.Min(maxX, x)); 
-                    y = Math.Max(minY, Math.Min(maxY, y)); 
-                    z = Math.Max(minZ, Math.Min(maxZ, z));
-                    txtX.Text = x.ToString();
-                    txtY.Text = y.ToString();
-                    txtZ.Text = z.ToString();
-                    txtX.CaretIndex=txtX.Text.Length;
-                    txtY.CaretIndex=txtY.Text.Length;
-                    txtZ.CaretIndex=txtZ.Text.Length;
 
-                    ApplyExpressionToX(); 
-                    ApplyExpressionToY(); 
-                    ApplyExpressionToZ(); 
-                    
-                    x = Convert.ToDouble(txtCoordinateX.Text); 
-                    y = Convert.ToDouble(txtCoordinateY.Text); 
-                    z = Convert.ToDouble(txtCoordinateZ.Text); 
+                TextBox tb = sender as TextBox;
+                if (tb == null) return;
+
+                string text = tb.Text;
+
+                // ✅ If empty or invalid intermediate state → reset to 0
+                if (string.IsNullOrEmpty(text) || text == "-" || text == "." || text == "-.")
+                {
+                    tb.Text = "0";
+                    tb.CaretIndex = tb.Text.Length;
+                    return;
+                }
+
+                if (double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out double value))
+                {
+                    double x = sliderX.Value;
+                    double y = sliderY.Value;
+                    double z = sliderZ.Value;
+
+                    if (tb == txtX) x = value;
+                    if (tb == txtY) y = value;
+                    if (tb == txtZ) z = value;
+
+                    // clamp
+                    x = Math.Max(minX, Math.Min(maxX, x));
+                    y = Math.Max(minY, Math.Min(maxY, y));
+                    z = Math.Max(minZ, Math.Min(maxZ, z));
+
+                    // ✅ keep clamped values in textboxes
+                    txtX.Text = x.ToString(CultureInfo.InvariantCulture);
+                    txtY.Text = y.ToString(CultureInfo.InvariantCulture);
+                    txtZ.Text = z.ToString(CultureInfo.InvariantCulture);
+
+                    txtX.CaretIndex = txtX.Text.Length;
+                    txtY.CaretIndex = txtY.Text.Length;
+                    txtZ.CaretIndex = txtZ.Text.Length;
+
+                    ApplyExpressionToX();
+                    ApplyExpressionToY();
+                    ApplyExpressionToZ();
+
+                    x = Convert.ToDouble(txtCoordinateX.Text, CultureInfo.InvariantCulture);
+                    y = Convert.ToDouble(txtCoordinateY.Text, CultureInfo.InvariantCulture);
+                    z = Convert.ToDouble(txtCoordinateZ.Text, CultureInfo.InvariantCulture);
+
                     UpdatePoint(x, y, z); // Apply updates
-                    UpdateSphereLabel(new Point3D(x, y, z)); 
-                    sliderX.Value = Convert.ToDouble(txtX.Text); 
-                    sliderY.Value = Convert.ToDouble(txtY.Text);
-                    sliderZ.Value = Convert.ToDouble(txtZ.Text);
-                    txtUpdating = false; 
-                } 
-            } 
+                    UpdateSphereLabel(new Point3D(x, y, z));
+
+                    sliderX.Value = Convert.ToDouble(txtX.Text, CultureInfo.InvariantCulture);
+                    sliderY.Value = Convert.ToDouble(txtY.Text, CultureInfo.InvariantCulture);
+                    sliderZ.Value = Convert.ToDouble(txtZ.Text, CultureInfo.InvariantCulture);
+
+                    txtUpdating = false;
+                }
+            }
         }
+
 
 
 
@@ -557,18 +576,18 @@ namespace WpfAppThreeD
         //    {
         //        DrawGrid();
 
-                //        // Restore the pointer sphere
-                //        if (pointSphere != null && !view1.Children.Contains(pointSphere))
-                //            view1.Children.Add(pointSphere);
+        //        // Restore the pointer sphere
+        //        if (pointSphere != null && !view1.Children.Contains(pointSphere))
+        //            view1.Children.Add(pointSphere);
 
-                //        // Restore the coordinate label
-                //        if (coordLabel != null && !view1.Children.Contains(coordLabel))
-                //            view1.Children.Add(coordLabel);
+        //        // Restore the coordinate label
+        //        if (coordLabel != null && !view1.Children.Contains(coordLabel))
+        //            view1.Children.Add(coordLabel);
 
-                //        if (pointSphere != null)
-                //            DrawGuides(pointSphere.Center);
-                //    }
-                //}
+        //        if (pointSphere != null)
+        //            DrawGuides(pointSphere.Center);
+        //    }
+        //}
 
 
         private void txtRange_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
