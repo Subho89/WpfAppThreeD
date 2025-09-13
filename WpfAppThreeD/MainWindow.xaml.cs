@@ -502,7 +502,9 @@ namespace WpfAppThreeD
         {
             if (!sliderUpdating)
             {
-                txtUpdating = true; if (isUpdatingUI) return; // ignore programmatic changes
+                txtUpdating = true; 
+                if (isUpdatingUI) 
+                    return; // ignore programmatic changes
                 TextBox tb = sender as TextBox; 
                 if (tb == null) return; string text = tb.Text; // Allow intermediate states like "0.", "-", ".", "-."
                 if (string.IsNullOrEmpty(text) || text == "-" || text.EndsWith(".")) 
@@ -518,7 +520,14 @@ namespace WpfAppThreeD
                     // clamp
                     x = Math.Max(minX, Math.Min(maxX, x)); 
                     y = Math.Max(minY, Math.Min(maxY, y)); 
-                    z = Math.Max(minZ, Math.Min(maxZ, z)); 
+                    z = Math.Max(minZ, Math.Min(maxZ, z));
+                    txtX.Text = x.ToString();
+                    txtY.Text = y.ToString();
+                    txtZ.Text = z.ToString();
+                    txtX.CaretIndex=txtX.Text.Length;
+                    txtY.CaretIndex=txtY.Text.Length;
+                    txtZ.CaretIndex=txtZ.Text.Length;
+
                     ApplyExpressionToX(); 
                     ApplyExpressionToY(); 
                     ApplyExpressionToZ(); 
@@ -528,9 +537,9 @@ namespace WpfAppThreeD
                     z = Convert.ToDouble(txtCoordinateZ.Text); 
                     UpdatePoint(x, y, z); // Apply updates
                     UpdateSphereLabel(new Point3D(x, y, z)); 
-                    sliderX.Value = x; 
-                    sliderY.Value = y; 
-                    sliderZ.Value = z; 
+                    sliderX.Value = Convert.ToDouble(txtX.Text); 
+                    sliderY.Value = Convert.ToDouble(txtY.Text);
+                    sliderZ.Value = Convert.ToDouble(txtZ.Text);
                     txtUpdating = false; 
                 } 
             } 
