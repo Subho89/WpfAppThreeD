@@ -56,7 +56,7 @@ namespace WpfAppThreeD
             txtX.TextChanged += txtPointerInput_TextChanged;
             txtY.TextChanged += txtPointerInput_TextChanged;
             txtZ.TextChanged += txtPointerInput_TextChanged;
-            txtStep.TextChanged += txtStep_TextChanged;
+            //txtStep.TextChanged += txtStep_TextChanged;
             txtMinX.TextChanged += txtRange_TextChanged;
             txtMinY.TextChanged += txtRange_TextChanged;
             txtMinZ.TextChanged += txtRange_TextChanged;
@@ -76,12 +76,17 @@ namespace WpfAppThreeD
         private List<BillboardTextVisual3D> yTicks = new();
         private List<BillboardTextVisual3D> zTicks = new();
 
+
         private void DrawGrid()
         {
             view1.Children.Clear();
             view1.Children.Add(new DefaultLights());
 
-            double.TryParse(txtStep.Text, out double step);
+            // Parse step values for each axis, fallback to 1 if invalid
+            double stepX = 1, stepY = 1, stepZ = 1;
+            double.TryParse(txtStepX.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out stepX);
+            double.TryParse(txtStepY.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out stepY);
+            double.TryParse(txtStepZ.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out stepZ);
 
             // reset tick references
             xTicks.Clear();
@@ -121,39 +126,48 @@ namespace WpfAppThreeD
 
             // ---------------- GRID PLANES ----------------
             var gridXY = new LinesVisual3D { Color = Colors.LightGray, Thickness = 0.5 };
-            for (double y = minY; y <= maxY; y += step)
+            int stepsY = (int)Math.Round((maxY - minY) / stepY);
+            int stepsX = (int)Math.Round((maxX - minX) / stepX);
+            for (int i = 0; i <= stepsY; i++)
             {
+                double y = Math.Round(minY + i * stepY, 6);
                 gridXY.Points.Add(new Point3D(minX, y, 0));
                 gridXY.Points.Add(new Point3D(maxX, y, 0));
             }
-            for (double x = minX; x <= maxX; x += step)
+            for (int i = 0; i <= stepsX; i++)
             {
+                double x = Math.Round(minX + i * stepX, 6);
                 gridXY.Points.Add(new Point3D(x, minY, 0));
                 gridXY.Points.Add(new Point3D(x, maxY, 0));
             }
             view1.Children.Add(gridXY);
 
             var gridXZ = new LinesVisual3D { Color = Colors.LightGray, Thickness = 0.5 };
-            for (double z = minZ; z <= maxZ; z += step)
+            int stepsZ = (int)Math.Round((maxZ - minZ) / stepZ);
+            for (int i = 0; i <= stepsZ; i++)
             {
+                double z = Math.Round(minZ + i * stepZ, 6);
                 gridXZ.Points.Add(new Point3D(minX, 0, z));
                 gridXZ.Points.Add(new Point3D(maxX, 0, z));
             }
-            for (double x = minX; x <= maxX; x += step)
+            for (int i = 0; i <= stepsX; i++)
             {
+                double x = Math.Round(minX + i * stepX, 6);
                 gridXZ.Points.Add(new Point3D(x, 0, minZ));
                 gridXZ.Points.Add(new Point3D(x, 0, maxZ));
             }
             view1.Children.Add(gridXZ);
 
             var gridYZ = new LinesVisual3D { Color = Colors.LightGray, Thickness = 0.5 };
-            for (double z = minZ; z <= maxZ; z += step)
+            for (int i = 0; i <= stepsZ; i++)
             {
+                double z = Math.Round(minZ + i * stepZ, 6);
                 gridYZ.Points.Add(new Point3D(0, minY, z));
                 gridYZ.Points.Add(new Point3D(0, maxY, z));
             }
-            for (double y = minY; y <= maxY; y += step)
+            for (int i = 0; i <= stepsY; i++)
             {
+                double y = Math.Round(minY + i * stepY, 6);
                 gridYZ.Points.Add(new Point3D(0, y, minZ));
                 gridYZ.Points.Add(new Point3D(0, y, maxZ));
             }
@@ -165,57 +179,32 @@ namespace WpfAppThreeD
             view1.Children.Add(new LinesVisual3D { Color = Colors.Blue, Thickness = 2, Points = new Point3DCollection { new Point3D(0, 0, minZ), new Point3D(0, 0, maxZ) } });
 
             // ---------------- AXIS LABELS ----------------
-            xLabel = new BillboardTextVisual3D
-            {
-                Text = "X",
-                Position = new Point3D(maxX + 0.5, 0, 0),
-                Foreground = Brushes.Red,
-                FontSize = sliderFontSize.Value,
-                FontWeight = FontWeights.Bold
-            };
-            view1.Children.Add(xLabel);
-
-            yLabel = new BillboardTextVisual3D
-            {
-                Text = "Y",
-                Position = new Point3D(0, maxY + 0.5, 0),
-                Foreground = Brushes.Green,
-                FontSize = sliderFontSize.Value,
-                FontWeight = FontWeights.Bold
-            };
-            view1.Children.Add(yLabel);
-
-            zLabel = new BillboardTextVisual3D
-            {
-                Text = "Z",
-                Position = new Point3D(0, 0, maxZ + 0.5),
-                Foreground = Brushes.Blue,
-                FontSize = sliderFontSize.Value,
-                FontWeight = FontWeights.Bold
-            };
-            view1.Children.Add(zLabel);
+            xLabel = new BillboardTextVisual3D { Text = "X", Position = new Point3D(maxX + 0.5, 0, 0), Foreground = Brushes.Red, FontSize = sliderFontSize.Value, FontWeight = FontWeights.Bold };
+            yLabel = new BillboardTextVisual3D { Text = "Y", Position = new Point3D(0, maxY + 0.5, 0), Foreground = Brushes.Green, FontSize = sliderFontSize.Value, FontWeight = FontWeights.Bold };
+            zLabel = new BillboardTextVisual3D { Text = "Z", Position = new Point3D(0, 0, maxZ + 0.5), Foreground = Brushes.Blue, FontSize = sliderFontSize.Value, FontWeight = FontWeights.Bold };
+            view1.Children.Add(xLabel); view1.Children.Add(yLabel); view1.Children.Add(zLabel);
 
             // ---------------- RULER TICKS ----------------
-            for (double x = minX; x <= maxX; x += step)
+            for (int i = 0; i <= stepsX; i++)
             {
+                double x = Math.Round(minX + i * stepX, 6);
                 view1.Children.Add(new LinesVisual3D { Color = Colors.Red, Points = new Point3DCollection { new Point3D(x, -0.1, 0), new Point3D(x, 0.1, 0) } });
                 var tick = new BillboardTextVisual3D { Text = x.ToString("0.###"), Position = new Point3D(x, -0.3, 0), Foreground = Brushes.Red, FontSize = sliderFontSize.Value };
-                view1.Children.Add(tick);
-                xTicks.Add(tick);
+                view1.Children.Add(tick); xTicks.Add(tick);
             }
-            for (double y = minY; y <= maxY; y += step)
+            for (int i = 0; i <= stepsY; i++)
             {
+                double y = Math.Round(minY + i * stepY, 6);
                 view1.Children.Add(new LinesVisual3D { Color = Colors.Green, Points = new Point3DCollection { new Point3D(-0.1, y, 0), new Point3D(0.1, y, 0) } });
                 var tick = new BillboardTextVisual3D { Text = y.ToString("0.###"), Position = new Point3D(-0.3, y, 0), Foreground = Brushes.Green, FontSize = sliderFontSize.Value };
-                view1.Children.Add(tick);
-                yTicks.Add(tick);
+                view1.Children.Add(tick); yTicks.Add(tick);
             }
-            for (double z = minZ; z <= maxZ; z += step)
+            for (int i = 0; i <= stepsZ; i++)
             {
+                double z = Math.Round(minZ + i * stepZ, 6);
                 view1.Children.Add(new LinesVisual3D { Color = Colors.Blue, Points = new Point3DCollection { new Point3D(0, -0.1, z), new Point3D(0, 0.1, z) } });
                 var tick = new BillboardTextVisual3D { Text = z.ToString("0.###"), Position = new Point3D(0, -0.3, z), Foreground = Brushes.Blue, FontSize = sliderFontSize.Value };
-                view1.Children.Add(tick);
-                zTicks.Add(tick);
+                view1.Children.Add(tick); zTicks.Add(tick);
             }
 
             // ---------------- RE-ADD POINTER + LABEL ----------------
@@ -361,7 +350,6 @@ namespace WpfAppThreeD
 
         private void view1_MouseMove(object sender, MouseEventArgs e)
         {
-            var x= pointSphere.Radius;
             if (isDragging && pointSphere != null)
             {
                 Point pos = e.GetPosition(view1);
@@ -373,13 +361,13 @@ namespace WpfAppThreeD
 
                 if (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift))
                 {
-                    // Control Z
+                    // Control Z movement
                     double dz = -(pos.Y - lastMousePos.Y) * (maxZ - minZ) / 500;
                     newZ = Math.Max(minZ, Math.Min(maxZ, current.Z + dz));
                 }
                 else
                 {
-                    // Control X/Y
+                    // Control X/Y movement
                     double dx = (pos.X - lastMousePos.X) * (maxX - minX) / 500;
                     double dy = -(pos.Y - lastMousePos.Y) * (maxY - minY) / 500;
 
@@ -387,15 +375,17 @@ namespace WpfAppThreeD
                     newY = Math.Max(minY, Math.Min(maxY, current.Y + dy));
                 }
 
-                //  Snap-to-Grid logic
-                double step = 1;
-                double.TryParse(txtStep.Text, out step);
+                //  Snap-to-Grid logic with separate steps
+                double stepX = Convert.ToDouble(txtStepX.Text), stepY = Convert.ToDouble(txtStepY.Text), stepZ = Convert.ToDouble(txtStepZ.Text);
+                double.TryParse(txtStepX.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out stepX);
+                double.TryParse(txtStepY.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out stepY);
+                double.TryParse(txtStepZ.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out stepZ);
 
                 if (chkSnapToGrid.IsChecked == true)
                 {
-                    newX = GetSnappedValue(newX, step);
-                    newY = GetSnappedValue(newY, step);
-                    newZ = GetSnappedValue(newZ, step);
+                    newX = GetSnappedValue(newX, stepX);
+                    newY = GetSnappedValue(newY, stepY);
+                    newZ = GetSnappedValue(newZ, stepZ);
                 }
 
                 // Apply updates
@@ -414,6 +404,7 @@ namespace WpfAppThreeD
                 lastMousePos = pos;
             }
         }
+
 
 
         private void btnSetStep_Click(object sender, RoutedEventArgs e)
@@ -460,12 +451,14 @@ namespace WpfAppThreeD
                 // Final snap-to-grid adjustment
                 if (pointSphere != null && chkSnapToGrid.IsChecked == true)
                 {
-                    double step = 1;
-                    double.TryParse(txtStep.Text, out step);
+                    double stepX = 1, stepY = 1, stepZ = 1;
+                    double.TryParse(txtStepX.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out stepX);
+                    double.TryParse(txtStepY.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out stepY);
+                    double.TryParse(txtStepZ.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out stepZ);
 
-                    double newX = GetSnappedValue(pointSphere.Center.X, step);
-                    double newY = GetSnappedValue(pointSphere.Center.Y, step);
-                    double newZ = GetSnappedValue(pointSphere.Center.Z, step);
+                    double newX = GetSnappedValue(pointSphere.Center.X, stepX);
+                    double newY = GetSnappedValue(pointSphere.Center.Y, stepY);
+                    double newZ = GetSnappedValue(pointSphere.Center.Z, stepZ);
 
                     UpdatePoint(newX, newY, newZ);
                     UpdateSphereLabel(new Point3D(newX, newY, newZ));
@@ -480,6 +473,7 @@ namespace WpfAppThreeD
                 }
             }
         }
+
 
 
         //private void txtPointerInput_TextChanged(object sender, TextChangedEventArgs e)
@@ -550,24 +544,24 @@ namespace WpfAppThreeD
 
 
 
-        private void txtStep_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
-        {
-            if (double.TryParse(txtStep.Text, out double step) && step > 0)
-            {
-                DrawGrid();
+        //private void txtStep_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        //{
+        //    if (double.TryParse(txtStep.Text, out double step) && step > 0)
+        //    {
+        //        DrawGrid();
 
-                // Restore the pointer sphere
-                if (pointSphere != null && !view1.Children.Contains(pointSphere))
-                    view1.Children.Add(pointSphere);
+        //        // Restore the pointer sphere
+        //        if (pointSphere != null && !view1.Children.Contains(pointSphere))
+        //            view1.Children.Add(pointSphere);
 
-                // Restore the coordinate label
-                if (coordLabel != null && !view1.Children.Contains(coordLabel))
-                    view1.Children.Add(coordLabel);
+        //        // Restore the coordinate label
+        //        if (coordLabel != null && !view1.Children.Contains(coordLabel))
+        //            view1.Children.Add(coordLabel);
 
-                if (pointSphere != null)
-                    DrawGuides(pointSphere.Center);
-            }
-        }
+        //        if (pointSphere != null)
+        //            DrawGuides(pointSphere.Center);
+        //    }
+        //}
 
 
         private void txtRange_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
@@ -604,36 +598,56 @@ namespace WpfAppThreeD
 
         private void Slider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            if (pointSphere != null)
+            if (pointSphere == null) return;
+
+            double newX = sliderX.Value;
+            double newY = sliderY.Value;
+            double newZ = sliderZ.Value;
+
+            // Snap-to-Grid logic
+            double stepX = ParseStep(txtStepX.Text, 1);
+            double stepY = ParseStep(txtStepY.Text, 1);
+            double stepZ = ParseStep(txtStepZ.Text, 1);
+
+            if (chkSnapToGrid.IsChecked == true)
             {
-                double newX = sliderX.Value;
-                double newY = sliderY.Value;
-                double newZ = sliderZ.Value;
+                newX = GetSnappedValue(newX, stepX);
+                newY = GetSnappedValue(newY, stepY);
+                newZ = GetSnappedValue(newZ, stepZ);
 
-                //  Snap-to-Grid logic
-                double step = 1;
-                double.TryParse(txtStep.Text, out step);
-
-                if (chkSnapToGrid.IsChecked == true)
-                {
-                    newX = GetSnappedValue(newX, step);
-                    newY = GetSnappedValue(newY, step);
-                    newZ = GetSnappedValue(newZ, step);
-
-                    // Update sliders to reflect snapped values
-                    sliderX.Value = newX;
-                    sliderY.Value = newY;
-                    sliderZ.Value = newZ;
-                }
-
-                // Apply updates
-                UpdatePoint(newX, newY, newZ);
-                UpdateSphereLabel(new Point3D(newX, newY, newZ));
-
-                txtCoordinateX.Text = newX.ToString("F2");
-                txtCoordinateY.Text = newY.ToString("F2");
-                txtCoordinateZ.Text = newZ.ToString("F2");
+                // Prevent feedback loops
+                if (Math.Abs(sliderX.Value - newX) > double.Epsilon) sliderX.Value = newX;
+                if (Math.Abs(sliderY.Value - newY) > double.Epsilon) sliderY.Value = newY;
+                if (Math.Abs(sliderZ.Value - newZ) > double.Epsilon) sliderZ.Value = newZ;
             }
+
+            // Apply expressions here
+            txtX.Text = newX.ToString(CultureInfo.InvariantCulture);
+            txtY.Text = newY.ToString(CultureInfo.InvariantCulture);
+            txtZ.Text = newZ.ToString(CultureInfo.InvariantCulture);
+
+            ApplyExpressionToX();
+            ApplyExpressionToY();
+            ApplyExpressionToZ();
+
+            // Read expression results back
+            if (!double.TryParse(txtCoordinateX.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out newX))
+                newX = 0;
+            if (!double.TryParse(txtCoordinateY.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out newY))
+                newY = 0;
+            if (!double.TryParse(txtCoordinateZ.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out newZ))
+                newZ = 0;
+
+            // Apply updates
+            UpdatePoint(newX, newY, newZ);
+            UpdateSphereLabel(new Point3D(newX, newY, newZ));
+        }
+
+        private double ParseStep(string input, double fallback)
+        {
+            if (double.TryParse(input, NumberStyles.Float, CultureInfo.InvariantCulture, out double step) && step > 0)
+                return step;
+            return fallback;
         }
 
         private void sliderFontSize_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -762,7 +776,7 @@ namespace WpfAppThreeD
             if (double.TryParse(txtMinX.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out double min) &&
                 double.TryParse(txtMaxX.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out double max))
             {
-                var dlg = new RangeDialog(min, max, "X") { Owner = this };
+                var dlg = new RangeDialog(min, max,Convert.ToDouble(txtStepX.Text), "X") { Owner = this };
                 if (dlg.ShowDialog() == true)
                 {
                     // Update min/max values
@@ -771,6 +785,8 @@ namespace WpfAppThreeD
                     sliderX.Minimum = dlg.MinValue;
                     sliderX.Maximum = dlg.MaxValue;
                     txtXExp.Text = dlg.Expression;
+                    txtStepX.Text =  dlg.step.ToString(CultureInfo.InvariantCulture);
+                    DrawGrid();
                     // Save rounding / digits / expression
                     ApplyRangeSettings("X", dlg);
 
@@ -795,7 +811,7 @@ namespace WpfAppThreeD
             if (double.TryParse(txtMinY.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out double min) &&
                 double.TryParse(txtMaxY.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out double max))
             {
-                var dlg = new RangeDialog(min, max,"Y") { Owner = this };
+                var dlg = new RangeDialog(min, max, Convert.ToDouble(txtStepY.Text), "Y") { Owner = this };
                 if (dlg.ShowDialog() == true)
                 {
                     // Update min/max values
@@ -804,6 +820,8 @@ namespace WpfAppThreeD
                     sliderY.Minimum = dlg.MinValue;
                     sliderY.Maximum = dlg.MaxValue;
                     txtYExp.Text = dlg.Expression;
+                    txtStepY.Text = dlg.step.ToString(CultureInfo.InvariantCulture);
+                    DrawGrid();
                     // Save rounding / digits / expression
                     ApplyRangeSettings("Y", dlg);
 
@@ -828,7 +846,7 @@ namespace WpfAppThreeD
             if (double.TryParse(txtMinZ.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out double min) &&
                 double.TryParse(txtMaxZ.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out double max))
             {
-                var dlg = new RangeDialog(min, max,"Z") { Owner = this };
+                var dlg = new RangeDialog(min, max, Convert.ToDouble(txtStepZ.Text), "Z") { Owner = this };
                 if (dlg.ShowDialog() == true)
                 {
                     // Update min/max values
@@ -837,8 +855,8 @@ namespace WpfAppThreeD
                     sliderZ.Minimum = dlg.MinValue;
                     sliderZ.Maximum = dlg.MaxValue;
                     txtZExp.Text = dlg.Expression;
-
-
+                    txtStepZ.Text = dlg.step.ToString(CultureInfo.InvariantCulture);
+                    DrawGrid();
                     // Save rounding / digits / expression
                     ApplyRangeSettings("Z", dlg);
 

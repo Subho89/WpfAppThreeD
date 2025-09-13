@@ -48,6 +48,8 @@
                                         <TextBox x:Name="txtXExp" Width="80" Text="" Margin="5,0" IsReadOnly="True"/>
                                         <TextBlock Text="X Coordinates:" VerticalAlignment="Center"/>
                                         <TextBox x:Name="txtCoordinateX" Width="80" Text="0" Margin="5,0" IsReadOnly="True"/>
+                                        <TextBlock Text="Step X:" VerticalAlignment="Center"/>
+                                        <TextBox x:Name="txtStepX" Width="80" Text="1" Margin="5,0" IsReadOnly="True"/>
                                     </StackPanel>
 
                                     <!-- Y Axis -->
@@ -68,6 +70,8 @@
                                         <TextBox x:Name="txtYExp" Width="80" Text="" Margin="5,0" IsReadOnly="True"/>
                                         <TextBlock Text="Y Coordinates:" VerticalAlignment="Center"/>
                                         <TextBox x:Name="txtCoordinateY" Width="80" Text="0" Margin="5,0" IsReadOnly="True"/>
+                                        <TextBlock Text="Step Y:" VerticalAlignment="Center"/>
+                                        <TextBox x:Name="txtStepY" Width="80" Text="1" Margin="5,0" IsReadOnly="True"/>
                                     </StackPanel>
 
                                     <!-- Z Axis -->
@@ -88,6 +92,8 @@
                                         <TextBox x:Name="txtZExp" Width="80" Text="" Margin="5,0" IsReadOnly="True"/>
                                         <TextBlock Text="Z Coordinates:" VerticalAlignment="Center"/>
                                         <TextBox x:Name="txtCoordinateZ" Width="80" Text="0" Margin="5,0" IsReadOnly="True"/>
+                                        <TextBlock Text="Step Z:" VerticalAlignment="Center"/>
+                                        <TextBox x:Name="txtStepZ" Width="80" Text="1" Margin="5,0" IsReadOnly="True"/>
                                     </StackPanel>
 
                                 </StackPanel>
@@ -144,8 +150,8 @@ TickFrequency="0.1" IsSnapToTickEnabled="false" Margin="5,0"/>
                         </Grid>
                         <!-- Step + Snap to Grid -->
                         <StackPanel Orientation="Horizontal" Margin="5">
-                            <TextBlock Text="Step:" VerticalAlignment="Center"/>
-                            <TextBox x:Name="txtStep" Width="50" Text="1" Margin="5,0"/>
+                            <!--<TextBlock Text="Step:" VerticalAlignment="Center"/>-->
+                            <!--<TextBox x:Name="txtStep" Width="50" Text="1" Margin="5,0"/>-->
                             <CheckBox x:Name="chkSnapToGrid" Content="Snap to Grid" Margin="20,0,0,0" IsChecked="False"/>
                         </StackPanel>
 
