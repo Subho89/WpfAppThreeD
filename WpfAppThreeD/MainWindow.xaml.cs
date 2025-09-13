@@ -34,6 +34,8 @@ namespace WpfAppThreeD
 
         private bool isUpdatingUI = false;
 
+        private bool txtUpdating = false;
+        private bool sliderUpdating = false;
         public MainWindow()
         {
             
@@ -498,47 +500,43 @@ namespace WpfAppThreeD
 
         private void txtPointerInput_TextChanged(object sender, TextChangedEventArgs e)
         {
-            if (isUpdatingUI) return; // ignore programmatic changes
-
-            TextBox tb = sender as TextBox;
-            if (tb == null) return;
-
-            string text = tb.Text;
-
-            // Allow intermediate states like "0.", "-", ".", "-."
-            if (string.IsNullOrEmpty(text) || text == "-" || text.EndsWith("."))
-                return;
-
-            if (double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out double value))
+            if (!sliderUpdating)
             {
-                double x = sliderX.Value;
-                double y = sliderY.Value; 
-                double z = sliderZ.Value; 
-
-                if (tb == txtX) x = value;
-                if (tb == txtY) y = value;
-                if (tb == txtZ) z = value;
-
-                // clamp
-                x = Math.Max(minX, Math.Min(maxX, x));
-                y = Math.Max(minY, Math.Min(maxY, y));
-                z = Math.Max(minZ, Math.Min(maxZ, z));
-
-                ApplyExpressionToX();
-                ApplyExpressionToY();
-                ApplyExpressionToZ();
-
-                x = Convert.ToDouble(txtCoordinateX.Text);
-                y = Convert.ToDouble(txtCoordinateY.Text);
-                z = Convert.ToDouble(txtCoordinateZ.Text);
-
-                UpdatePoint(x, y, z);
-
-                sliderX.Value = x;
-                sliderY.Value = y;
-                sliderZ.Value = z;
-            }
+                txtUpdating = true; if (isUpdatingUI) return; // ignore programmatic changes
+                TextBox tb = sender as TextBox; 
+                if (tb == null) return; string text = tb.Text; // Allow intermediate states like "0.", "-", ".", "-."
+                if (string.IsNullOrEmpty(text) || text == "-" || text.EndsWith(".")) 
+                    return; 
+                if (double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out double value)) 
+                { 
+                    double x = sliderX.Value; 
+                    double y = sliderY.Value; 
+                    double z = sliderZ.Value; 
+                    if (tb == txtX) x = value; 
+                    if (tb == txtY) y = value; 
+                    if (tb == txtZ) z = value; 
+                    // clamp
+                    x = Math.Max(minX, Math.Min(maxX, x)); 
+                    y = Math.Max(minY, Math.Min(maxY, y)); 
+                    z = Math.Max(minZ, Math.Min(maxZ, z)); 
+                    ApplyExpressionToX(); 
+                    ApplyExpressionToY(); 
+                    ApplyExpressionToZ(); 
+                    
+                    x = Convert.ToDouble(txtCoordinateX.Text); 
+                    y = Convert.ToDouble(txtCoordinateY.Text); 
+                    z = Convert.ToDouble(txtCoordinateZ.Text); 
+                    UpdatePoint(x, y, z); // Apply updates
+                    UpdateSphereLabel(new Point3D(x, y, z)); 
+                    sliderX.Value = x; 
+                    sliderY.Value = y; 
+                    sliderZ.Value = z; 
+                    txtUpdating = false; 
+                } 
+            } 
         }
+
+
 
 
 
@@ -550,18 +548,18 @@ namespace WpfAppThreeD
         //    {
         //        DrawGrid();
 
-        //        // Restore the pointer sphere
-        //        if (pointSphere != null && !view1.Children.Contains(pointSphere))
-        //            view1.Children.Add(pointSphere);
+                //        // Restore the pointer sphere
+                //        if (pointSphere != null && !view1.Children.Contains(pointSphere))
+                //            view1.Children.Add(pointSphere);
 
-        //        // Restore the coordinate label
-        //        if (coordLabel != null && !view1.Children.Contains(coordLabel))
-        //            view1.Children.Add(coordLabel);
+                //        // Restore the coordinate label
+                //        if (coordLabel != null && !view1.Children.Contains(coordLabel))
+                //            view1.Children.Add(coordLabel);
 
-        //        if (pointSphere != null)
-        //            DrawGuides(pointSphere.Center);
-        //    }
-        //}
+                //        if (pointSphere != null)
+                //            DrawGuides(pointSphere.Center);
+                //    }
+                //}
 
 
         private void txtRange_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
@@ -598,49 +596,56 @@ namespace WpfAppThreeD
 
         private void Slider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            if (pointSphere == null) return;
-
-            double newX = sliderX.Value;
-            double newY = sliderY.Value;
-            double newZ = sliderZ.Value;
-
-            // Snap-to-Grid logic
-            double stepX = ParseStep(txtStepX.Text, 1);
-            double stepY = ParseStep(txtStepY.Text, 1);
-            double stepZ = ParseStep(txtStepZ.Text, 1);
-
-            if (chkSnapToGrid.IsChecked == true)
+            if (!txtUpdating)
             {
-                newX = GetSnappedValue(newX, stepX);
-                newY = GetSnappedValue(newY, stepY);
-                newZ = GetSnappedValue(newZ, stepZ);
+                sliderUpdating = true;
+                if (pointSphere == null) return;
 
-                // Prevent feedback loops
-                if (Math.Abs(sliderX.Value - newX) > double.Epsilon) sliderX.Value = newX;
-                if (Math.Abs(sliderY.Value - newY) > double.Epsilon) sliderY.Value = newY;
-                if (Math.Abs(sliderZ.Value - newZ) > double.Epsilon) sliderZ.Value = newZ;
+                double newX = sliderX.Value;
+                double newY = sliderY.Value;
+                double newZ = sliderZ.Value;
+
+                // Snap-to-Grid logic
+                double stepX = ParseStep(txtStepX.Text, 1);
+                double stepY = ParseStep(txtStepY.Text, 1);
+                double stepZ = ParseStep(txtStepZ.Text, 1);
+
+                if (chkSnapToGrid.IsChecked == true)
+                {
+                    newX = GetSnappedValue(newX, stepX);
+                    newY = GetSnappedValue(newY, stepY);
+                    newZ = GetSnappedValue(newZ, stepZ);
+
+                    // Prevent feedback loops
+                    if (Math.Abs(sliderX.Value - newX) > double.Epsilon) sliderX.Value = newX;
+                    if (Math.Abs(sliderY.Value - newY) > double.Epsilon) sliderY.Value = newY;
+                    if (Math.Abs(sliderZ.Value - newZ) > double.Epsilon) sliderZ.Value = newZ;
+                }
+
+                // Apply expressions here
+                txtX.Text = newX.ToString(CultureInfo.InvariantCulture);
+                txtY.Text = newY.ToString(CultureInfo.InvariantCulture);
+                txtZ.Text = newZ.ToString(CultureInfo.InvariantCulture);
+
+                ApplyExpressionToX();
+                ApplyExpressionToY();
+                ApplyExpressionToZ();
+
+                // Read expression results back
+                if (!double.TryParse(txtCoordinateX.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out newX))
+                    newX = 0;
+                if (!double.TryParse(txtCoordinateY.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out newY))
+                    newY = 0;
+                if (!double.TryParse(txtCoordinateZ.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out newZ))
+                    newZ = 0;
+
+                // Apply updates
+                UpdatePoint(newX, newY, newZ);
+                UpdateSphereLabel(new Point3D(newX, newY, newZ));
+
+                sliderUpdating = false;
             }
-
-            // Apply expressions here
-            txtX.Text = newX.ToString(CultureInfo.InvariantCulture);
-            txtY.Text = newY.ToString(CultureInfo.InvariantCulture);
-            txtZ.Text = newZ.ToString(CultureInfo.InvariantCulture);
-
-            ApplyExpressionToX();
-            ApplyExpressionToY();
-            ApplyExpressionToZ();
-
-            // Read expression results back
-            if (!double.TryParse(txtCoordinateX.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out newX))
-                newX = 0;
-            if (!double.TryParse(txtCoordinateY.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out newY))
-                newY = 0;
-            if (!double.TryParse(txtCoordinateZ.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out newZ))
-                newZ = 0;
-
-            // Apply updates
-            UpdatePoint(newX, newY, newZ);
-            UpdateSphereLabel(new Point3D(newX, newY, newZ));
+            
         }
 
         private double ParseStep(string input, double fallback)
