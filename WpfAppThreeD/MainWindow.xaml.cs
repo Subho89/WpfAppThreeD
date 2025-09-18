@@ -36,6 +36,9 @@ namespace WpfAppThreeD
 
         private bool txtUpdating = false;
         private bool sliderUpdating = false;
+        RangeVM rangeX = new RangeVM();
+        RangeVM rangeY=new RangeVM();
+        RangeVM rangeZ=new RangeVM();
         public MainWindow()
         {
             
@@ -341,14 +344,7 @@ namespace WpfAppThreeD
             }
         }
 
-
-        private void TextBox_PreviewKeyDown(object sender, KeyEventArgs e)
-        {
-            // Block space
-            //if (e.Key == Key.Space) e.Handled = true;
-        }
-
-
+        
 
         private void view1_MouseMove(object sender, MouseEventArgs e)
         {
@@ -809,7 +805,19 @@ namespace WpfAppThreeD
             if (double.TryParse(txtMinX.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out double min) &&
                 double.TryParse(txtMaxX.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out double max))
             {
-                var dlg = new RangeDialog(min, max,Convert.ToDouble(txtStepX.Text), "X") { Owner = this };
+                if (rangeX == null)
+                {
+                    rangeX = new RangeVM();
+                }
+                
+                rangeX.axis = "X";
+                rangeX.min = Convert.ToDouble(txtMinX.Text);
+                rangeX.max= Convert.ToDouble(txtMaxX.Text);
+                rangeX.expression = txtXExp.Text;
+                rangeX.step = Convert.ToDouble(txtStepX.Text);
+                
+
+                var dlg = new RangeDialog(rangeX) { Owner = this };
                 if (dlg.ShowDialog() == true)
                 {
                     // Update min/max values
@@ -819,6 +827,16 @@ namespace WpfAppThreeD
                     sliderX.Maximum = dlg.MaxValue;
                     txtXExp.Text = dlg.Expression;
                     txtStepX.Text =  dlg.step.ToString(CultureInfo.InvariantCulture);
+
+                    rangeX.axis = "X";
+                    rangeX.min = Convert.ToDouble(txtMinX.Text);
+                    rangeX.max = Convert.ToDouble(txtMaxX.Text);
+                    rangeX.expression = txtXExp.Text;
+                    rangeX.step = Convert.ToDouble(txtStepX.Text);
+                    rangeX.roundingDigits = dlg.Digits;
+                    rangeX.rounding=dlg.rounding;
+
+
                     DrawGrid();
                     // Save rounding / digits / expression
                     ApplyRangeSettings("X", dlg);
@@ -844,7 +862,19 @@ namespace WpfAppThreeD
             if (double.TryParse(txtMinY.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out double min) &&
                 double.TryParse(txtMaxY.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out double max))
             {
-                var dlg = new RangeDialog(min, max, Convert.ToDouble(txtStepY.Text), "Y") { Owner = this };
+                if (rangeY == null)
+                {
+                    rangeY = new RangeVM();
+                }
+
+                rangeY.axis = "Y";
+                rangeY.min = Convert.ToDouble(txtMinY.Text);
+                rangeY.max = Convert.ToDouble(txtMaxY.Text);
+                rangeY.expression = txtYExp.Text;
+                rangeY.step = Convert.ToDouble(txtStepY.Text);
+
+
+                var dlg = new RangeDialog(rangeY) { Owner = this };
                 if (dlg.ShowDialog() == true)
                 {
                     // Update min/max values
@@ -854,6 +884,15 @@ namespace WpfAppThreeD
                     sliderY.Maximum = dlg.MaxValue;
                     txtYExp.Text = dlg.Expression;
                     txtStepY.Text = dlg.step.ToString(CultureInfo.InvariantCulture);
+
+                    rangeY.axis = "Y";
+                    rangeY.min = Convert.ToDouble(txtMinY.Text);
+                    rangeY.max = Convert.ToDouble(txtMaxY.Text);
+                    rangeY.expression = txtYExp.Text;
+                    rangeY.step = Convert.ToDouble(txtStepY.Text);
+                    rangeY.roundingDigits = dlg.Digits;
+                    rangeY.rounding = dlg.rounding;
+
                     DrawGrid();
                     // Save rounding / digits / expression
                     ApplyRangeSettings("Y", dlg);
@@ -879,7 +918,18 @@ namespace WpfAppThreeD
             if (double.TryParse(txtMinZ.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out double min) &&
                 double.TryParse(txtMaxZ.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out double max))
             {
-                var dlg = new RangeDialog(min, max, Convert.ToDouble(txtStepZ.Text), "Z") { Owner = this };
+                if (rangeZ == null)
+                {
+                    rangeZ = new RangeVM();
+                }
+
+                rangeZ.axis = "Z";
+                rangeZ.min = Convert.ToDouble(txtMinZ.Text);
+                rangeZ.max = Convert.ToDouble(txtMaxZ.Text);
+                rangeZ.expression = txtZExp.Text;
+                rangeZ.step = Convert.ToDouble(txtStepZ.Text);
+
+                var dlg = new RangeDialog(rangeZ) { Owner = this };
                 if (dlg.ShowDialog() == true)
                 {
                     // Update min/max values
@@ -889,6 +939,15 @@ namespace WpfAppThreeD
                     sliderZ.Maximum = dlg.MaxValue;
                     txtZExp.Text = dlg.Expression;
                     txtStepZ.Text = dlg.step.ToString(CultureInfo.InvariantCulture);
+
+                    rangeZ.axis = "Z";
+                    rangeZ.min = Convert.ToDouble(txtMinZ.Text);
+                    rangeZ.max = Convert.ToDouble(txtMaxZ.Text);
+                    rangeZ.expression = txtZExp.Text;
+                    rangeZ.step = Convert.ToDouble(txtStepZ.Text);
+                    rangeZ.roundingDigits = dlg.Digits;
+                    rangeZ.rounding = dlg.rounding;
+
                     DrawGrid();
                     // Save rounding / digits / expression
                     ApplyRangeSettings("Z", dlg);

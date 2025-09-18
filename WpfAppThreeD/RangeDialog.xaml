@@ -39,10 +39,16 @@
         <!-- Digits Slider -->
         <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,10,0,0" VerticalAlignment="Center">
             <TextBlock Text="Digits" Width="100" VerticalAlignment="Center"/>
-            <Slider x:Name="sliderDigits" Minimum="0" Maximum="10" Value="3" Width="200" IsEnabled="False"/>
+            <Slider x:Name="sliderDigits" 
+        Minimum="0" 
+        Maximum="6" 
+        Value="3" 
+        Width="200" 
+        TickFrequency="1" 
+        IsSnapToTickEnabled="True"/>
             <TextBox x:Name="txtDigits" 
                      Text="{Binding ElementName=sliderDigits, Path=Value, Mode=TwoWay}" 
-                     Width="40" Margin="5,0,0,0" HorizontalContentAlignment="Center"/>
+                     Width="40" Margin="5,0,0,0" HorizontalContentAlignment="Center" IsReadOnly="True"/>
         </StackPanel>
 
         <!-- Min/Max Values -->

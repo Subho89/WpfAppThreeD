@@ -4,6 +4,7 @@ using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace WpfAppThreeD
 {
@@ -19,6 +20,7 @@ namespace WpfAppThreeD
         public double MaxValue { get; private set; }
         public string axisCo { get; set; }
         public double step { get; set; }
+        public int rounding { get; set; }
 
         // guard to prevent re-entrancy when we update Text programmatically
         private bool isUpdatingText = false;
@@ -33,20 +35,38 @@ namespace WpfAppThreeD
             sliderDigits.Value = 3;
             sliderDigits.Visibility = Visibility.Collapsed;
             txtDigits.Visibility = Visibility.Collapsed;
-
+            sliderDigits.ValueChanged+=sliderDigits_ValueChanged;
             // Wire TextChanged so we can validate/enforce per-mode rules as user types
             //MinValueBox.TextChanged += ValueBox_TextChanged;
             //MaxValueBox.TextChanged += ValueBox_TextChanged;
         }
 
         // Constructor with prefilled values
-        public RangeDialog(double min, double max, double step,string axis) : this()
+        public RangeDialog(RangeVM range) : this()
         {
-            MinValueBox.Text = min.ToString(CultureInfo.InvariantCulture);
-            MaxValueBox.Text = max.ToString(CultureInfo.InvariantCulture);
-            lblExpression.Text = "Expression (Use " + axis + " in Caps as the original value of the coordinate to generate the expression.)";
-            axisCo = axis;
-            txtStep.Text = step.ToString(CultureInfo.InvariantCulture);
+            MinValueBox.Text =Convert.ToString(range.min);
+            MaxValueBox.Text = Convert.ToString(range.max);
+            lblExpression.Text = "Expression (Use " + range.axis + " in Caps as the original value of the coordinate to generate the expression.)";
+            axisCo = range.axis;
+            txtStep.Text = Convert.ToString(range.step);
+            if (range.rounding == 0)
+            {
+                btnR.IsChecked = true;
+            }
+            else if (range.rounding == 1) 
+            {
+            btnN.IsChecked = true;
+            }
+            else if(range.rounding == 2)
+            {
+                btnE.IsChecked = true;
+            }
+            else if (range.rounding == 3)
+            {
+                btnO.IsChecked = true;
+            }
+            txtExpression.Text=range.expression;
+            sliderDigits.Value = range.roundingDigits;
         }
 
         private void Rounding_Checked(object sender, RoutedEventArgs e)
@@ -82,6 +102,35 @@ namespace WpfAppThreeD
             //ValueBox_TextChanged(MinValueBox, null);
             //ValueBox_TextChanged(MaxValueBox, null);
         }
+
+        private void sliderDigits_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            int digits = (int)e.NewValue;
+
+            ApplyDigitFormatting(MinValueBox, digits);
+            ApplyDigitFormatting(MaxValueBox, digits);
+        }
+
+        private void ApplyDigitFormatting(TextBox box, int digits)
+        {
+            if (string.IsNullOrWhiteSpace(box.Text))
+                return;
+
+            if (double.TryParse(box.Text, out double value))
+            {
+                string format;
+
+                if (digits == 0)
+                    format = "0"; // integer only
+                else
+                    format = "0." + new string('0', digits); // fixed decimals
+
+                box.Text = value.ToString(format, CultureInfo.InvariantCulture);
+                box.CaretIndex = box.Text.Length;
+            }
+        }
+
+
 
         private void Ok_Click(object sender, RoutedEventArgs e)
         {
@@ -125,7 +174,7 @@ namespace WpfAppThreeD
             Digits = (int)sliderDigits.Value;
             Expression = txtExpression.Text.Trim();
             step=Convert.ToDouble(txtStep.Text.Trim());
-
+            rounding = (int)SelectedMode;
             if (!string.IsNullOrEmpty(Expression))
             {
                 if (!Expression.Contains(axisCo))
