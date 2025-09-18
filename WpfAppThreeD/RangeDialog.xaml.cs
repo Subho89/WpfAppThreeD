@@ -16,8 +16,8 @@ namespace WpfAppThreeD
         public int Digits { get; private set; }
         public string Expression { get; private set; }
 
-        public double MinValue { get; private set; }
-        public double MaxValue { get; private set; }
+        public string MinValue { get; private set; }
+        public string MaxValue { get; private set; }
         public string axisCo { get; set; }
         public double step { get; set; }
         public int rounding { get; set; }
@@ -97,6 +97,9 @@ namespace WpfAppThreeD
                 txtDigits.Visibility = Visibility.Collapsed;
             }
 
+
+            ValidateDecimalPlaces(MinValueBox);
+            ValidateDecimalPlaces(MaxValueBox);
             // Re-validate current box contents immediately with the newly selected mode
             // (safe because ValueBox_TextChanged uses isUpdatingText guard)
             //ValueBox_TextChanged(MinValueBox, null);
@@ -169,8 +172,8 @@ namespace WpfAppThreeD
                 }
             }
 
-            MinValue = min;
-            MaxValue = max;
+            MinValue = MinValueBox.Text;
+            MaxValue = MaxValueBox.Text;
             Digits = (int)sliderDigits.Value;
             Expression = txtExpression.Text.Trim();
             step=Convert.ToDouble(txtStep.Text.Trim());
@@ -267,12 +270,12 @@ namespace WpfAppThreeD
 
         private void MinValueBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            ValidateDecimalPlaces(MinValueBox);
+           // ValidateDecimalPlaces(MinValueBox);
         }
 
         private void MaxValueBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            ValidateDecimalPlaces(MaxValueBox);
+            //ValidateDecimalPlaces(MaxValueBox);
         }
 
 
@@ -321,6 +324,34 @@ namespace WpfAppThreeD
             {
                 e.CancelCommand();
             }
+        }
+
+        private void MaxValueBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            if (SelectedMode == RoundingMode.Real)
+            {
+                ValidateDecimalPlaces(MaxValueBox);
+
+                int digits = (int)sliderDigits.Value;
+
+                ApplyDigitFormatting(MaxValueBox, digits);
+            }
+            else
+                ValidateDecimalPlaces(MaxValueBox);
+        }
+
+        private void MinValueBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            if (SelectedMode == RoundingMode.Real)
+            {
+                ValidateDecimalPlaces(MinValueBox);
+
+                int digits = (int)sliderDigits.Value;
+
+                ApplyDigitFormatting(MinValueBox, digits);
+            }
+            else
+                ValidateDecimalPlaces(MinValueBox);
         }
     }
 }

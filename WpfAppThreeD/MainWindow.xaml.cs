@@ -329,16 +329,25 @@ namespace WpfAppThreeD
                 DrawGuides(new Point3D(x, y, z));
 
                 isUpdatingUI = true; // prevent recursive TextChanged
-                
+
                 //txtX.Text = x.ToString("0.###");
-                txtCoordinateX.Text = x.ToString("0.###");
-                txtCoordinateX.CaretIndex = txtCoordinateX.Text.Length;
+                //txtCoordinateX.Text = x.ToString("0.###");
+                //txtCoordinateX.CaretIndex = txtCoordinateX.Text.Length;
 
-                txtCoordinateY.Text = y.ToString("0.###");
-                txtCoordinateY.CaretIndex = txtCoordinateY.Text.Length;
+                //txtCoordinateY.Text = y.ToString("0.###");
+                //txtCoordinateY.CaretIndex = txtCoordinateY.Text.Length;
 
-                txtCoordinateZ.Text = z.ToString("0.###");
-                txtCoordinateZ.CaretIndex = txtCoordinateZ.Text.Length;
+                //txtCoordinateZ.Text = z.ToString("0.###");
+                //txtCoordinateZ.CaretIndex = txtCoordinateZ.Text.Length;
+
+                txtX.Text = x.ToString("0.###");
+                txtX.CaretIndex = txtX.Text.Length;
+
+                txtY.Text = y.ToString("0.###");
+                txtY.CaretIndex = txtY.Text.Length;
+
+                txtZ.Text = z.ToString("0.###");
+                txtZ.CaretIndex = txtZ.Text.Length;
 
                 isUpdatingUI = false;
             }
@@ -543,9 +552,13 @@ namespace WpfAppThreeD
                     ApplyExpressionToY();
                     ApplyExpressionToZ();
 
-                    x = Convert.ToDouble(txtCoordinateX.Text, CultureInfo.InvariantCulture);
-                    y = Convert.ToDouble(txtCoordinateY.Text, CultureInfo.InvariantCulture);
-                    z = Convert.ToDouble(txtCoordinateZ.Text, CultureInfo.InvariantCulture);
+                    //x = Convert.ToDouble(txtCoordinateX.Text, CultureInfo.InvariantCulture);
+                    //y = Convert.ToDouble(txtCoordinateY.Text, CultureInfo.InvariantCulture);
+                    //z = Convert.ToDouble(txtCoordinateZ.Text, CultureInfo.InvariantCulture);
+
+                    x = Convert.ToDouble(txtX.Text, CultureInfo.InvariantCulture);
+                    y = Convert.ToDouble(txtY.Text, CultureInfo.InvariantCulture);
+                    z = Convert.ToDouble(txtZ.Text, CultureInfo.InvariantCulture);
 
                     UpdatePoint(x, y, z); // Apply updates
                     UpdateSphereLabel(new Point3D(x, y, z));
@@ -558,32 +571,6 @@ namespace WpfAppThreeD
                 }
             }
         }
-
-
-
-
-
-
-
-
-        //private void txtStep_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
-        //{
-        //    if (double.TryParse(txtStep.Text, out double step) && step > 0)
-        //    {
-        //        DrawGrid();
-
-        //        // Restore the pointer sphere
-        //        if (pointSphere != null && !view1.Children.Contains(pointSphere))
-        //            view1.Children.Add(pointSphere);
-
-        //        // Restore the coordinate label
-        //        if (coordLabel != null && !view1.Children.Contains(coordLabel))
-        //            view1.Children.Add(coordLabel);
-
-        //        if (pointSphere != null)
-        //            DrawGuides(pointSphere.Center);
-        //    }
-        //}
 
 
         private void txtRange_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
@@ -615,6 +602,9 @@ namespace WpfAppThreeD
                 txtX.Text = "0";
                 txtY.Text = "0";
                 txtZ.Text = "0";
+                txtCoordinateX.Text = "0";
+                txtCoordinateY.Text = "0";
+                txtCoordinateZ.Text = "0";
             }
         }
 
@@ -655,12 +645,20 @@ namespace WpfAppThreeD
                 ApplyExpressionToY();
                 ApplyExpressionToZ();
 
+                //// Read expression results back
+                //if (!double.TryParse(txtCoordinateX.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out newX))
+                //    newX = 0;
+                //if (!double.TryParse(txtCoordinateY.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out newY))
+                //    newY = 0;
+                //if (!double.TryParse(txtCoordinateZ.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out newZ))
+                //    newZ = 0;
+
                 // Read expression results back
-                if (!double.TryParse(txtCoordinateX.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out newX))
+                if (!double.TryParse(txtX.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out newX))
                     newX = 0;
-                if (!double.TryParse(txtCoordinateY.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out newY))
+                if (!double.TryParse(txtY.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out newY))
                     newY = 0;
-                if (!double.TryParse(txtCoordinateZ.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out newZ))
+                if (!double.TryParse(txtZ.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out newZ))
                     newZ = 0;
 
                 // Apply updates
@@ -780,16 +778,36 @@ namespace WpfAppThreeD
 
         private void NumberValidationTextBox(object sender, TextCompositionEventArgs e)
         {
-            //// Allow only numbers
-            //e.Handled = !int.TryParse(e.Text, out _);
-
             TextBox textBox = sender as TextBox;
 
-            // simulate what the text will look like after input
+            // Simulate new text after keystroke
             string newText = textBox.Text.Insert(textBox.CaretIndex, e.Text);
 
-            Regex regex = new Regex(@"^-?\d*\.?\d*$");
+            // Allow optional sign, digits, and up to 6 decimals
+            Regex regex = new Regex(@"^-?\d*(\.\d{0,6})?$");
+
             e.Handled = !regex.IsMatch(newText);
+        }
+
+        private void TextBox_Pasting(object sender, DataObjectPastingEventArgs e)
+        {
+            if (e.DataObject.GetDataPresent(typeof(string)))
+            {
+                string pastedText = (string)e.DataObject.GetData(typeof(string));
+                TextBox textBox = sender as TextBox;
+
+                string newText = textBox.Text.Insert(textBox.CaretIndex, pastedText);
+                Regex regex = new Regex(@"^-?\d*(\.\d{0,6})?$");
+
+                if (!regex.IsMatch(newText))
+                {
+                    e.CancelCommand();
+                }
+            }
+            else
+            {
+                e.CancelCommand();
+            }
         }
 
         private void txtMinMax_LostFocus(object sender, RoutedEventArgs e)
@@ -811,8 +829,8 @@ namespace WpfAppThreeD
                 }
                 
                 rangeX.axis = "X";
-                rangeX.min = Convert.ToDouble(txtMinX.Text);
-                rangeX.max= Convert.ToDouble(txtMaxX.Text);
+                rangeX.min = (txtMinX.Text);
+                rangeX.max= (txtMaxX.Text);
                 rangeX.expression = txtXExp.Text;
                 rangeX.step = Convert.ToDouble(txtStepX.Text);
                 
@@ -823,14 +841,14 @@ namespace WpfAppThreeD
                     // Update min/max values
                     txtMinX.Text = dlg.MinValue.ToString(CultureInfo.InvariantCulture);
                     txtMaxX.Text = dlg.MaxValue.ToString(CultureInfo.InvariantCulture);
-                    sliderX.Minimum = dlg.MinValue;
-                    sliderX.Maximum = dlg.MaxValue;
+                    sliderX.Minimum = Convert.ToDouble(dlg.MinValue);
+                    sliderX.Maximum = Convert.ToDouble(dlg.MaxValue);
                     txtXExp.Text = dlg.Expression;
                     txtStepX.Text =  dlg.step.ToString(CultureInfo.InvariantCulture);
 
                     rangeX.axis = "X";
-                    rangeX.min = Convert.ToDouble(txtMinX.Text);
-                    rangeX.max = Convert.ToDouble(txtMaxX.Text);
+                    rangeX.min = (txtMinX.Text);
+                    rangeX.max = (txtMaxX.Text);
                     rangeX.expression = txtXExp.Text;
                     rangeX.step = Convert.ToDouble(txtStepX.Text);
                     rangeX.roundingDigits = dlg.Digits;
@@ -849,7 +867,8 @@ namespace WpfAppThreeD
 
                     // Apply the expression immediately
                     ApplyExpressionToX();
-                    x = Convert.ToDouble(txtCoordinateX.Text);
+                    x = Convert.ToDouble(txtX.Text);
+                    //x = Convert.ToDouble(txtCoordinateX.Text);
                     // Update the pointer
                     UpdatePoint(x, y, z);
                     UpdateSphereLabel(new Point3D(x, y, z));
@@ -868,8 +887,8 @@ namespace WpfAppThreeD
                 }
 
                 rangeY.axis = "Y";
-                rangeY.min = Convert.ToDouble(txtMinY.Text);
-                rangeY.max = Convert.ToDouble(txtMaxY.Text);
+                rangeY.min = (txtMinY.Text);
+                rangeY.max = (txtMaxY.Text);
                 rangeY.expression = txtYExp.Text;
                 rangeY.step = Convert.ToDouble(txtStepY.Text);
 
@@ -880,14 +899,14 @@ namespace WpfAppThreeD
                     // Update min/max values
                     txtMinY.Text = dlg.MinValue.ToString(CultureInfo.InvariantCulture);
                     txtMaxY.Text = dlg.MaxValue.ToString(CultureInfo.InvariantCulture);
-                    sliderY.Minimum = dlg.MinValue;
-                    sliderY.Maximum = dlg.MaxValue;
+                    sliderY.Minimum = Convert.ToDouble(dlg.MinValue);
+                    sliderY.Maximum = Convert.ToDouble(dlg.MaxValue);
                     txtYExp.Text = dlg.Expression;
                     txtStepY.Text = dlg.step.ToString(CultureInfo.InvariantCulture);
 
                     rangeY.axis = "Y";
-                    rangeY.min = Convert.ToDouble(txtMinY.Text);
-                    rangeY.max = Convert.ToDouble(txtMaxY.Text);
+                    rangeY.min = (txtMinY.Text);
+                    rangeY.max = (txtMaxY.Text);
                     rangeY.expression = txtYExp.Text;
                     rangeY.step = Convert.ToDouble(txtStepY.Text);
                     rangeY.roundingDigits = dlg.Digits;
@@ -905,7 +924,8 @@ namespace WpfAppThreeD
 
                     // Apply the expression immediately
                     ApplyExpressionToY();
-                    y = Convert.ToDouble(txtCoordinateY.Text);
+                    y = Convert.ToDouble(txtY.Text);
+                    //y = Convert.ToDouble(txtCoordinateY.Text);
                     // Update the pointer
                     UpdatePoint(x, y, z);
                     UpdateSphereLabel(new Point3D(x, y, z));
@@ -924,8 +944,8 @@ namespace WpfAppThreeD
                 }
 
                 rangeZ.axis = "Z";
-                rangeZ.min = Convert.ToDouble(txtMinZ.Text);
-                rangeZ.max = Convert.ToDouble(txtMaxZ.Text);
+                rangeZ.min = (txtMinZ.Text);
+                rangeZ.max = (txtMaxZ.Text);
                 rangeZ.expression = txtZExp.Text;
                 rangeZ.step = Convert.ToDouble(txtStepZ.Text);
 
@@ -935,14 +955,14 @@ namespace WpfAppThreeD
                     // Update min/max values
                     txtMinZ.Text = dlg.MinValue.ToString(CultureInfo.InvariantCulture);
                     txtMaxZ.Text = dlg.MaxValue.ToString(CultureInfo.InvariantCulture);
-                    sliderZ.Minimum = dlg.MinValue;
-                    sliderZ.Maximum = dlg.MaxValue;
+                    sliderZ.Minimum = Convert.ToDouble(dlg.MinValue);
+                    sliderZ.Maximum = Convert.ToDouble(dlg.MaxValue);
                     txtZExp.Text = dlg.Expression;
                     txtStepZ.Text = dlg.step.ToString(CultureInfo.InvariantCulture);
 
                     rangeZ.axis = "Z";
-                    rangeZ.min = Convert.ToDouble(txtMinZ.Text);
-                    rangeZ.max = Convert.ToDouble(txtMaxZ.Text);
+                    rangeZ.min = (txtMinZ.Text);
+                    rangeZ.max = (txtMaxZ.Text);
                     rangeZ.expression = txtZExp.Text;
                     rangeZ.step = Convert.ToDouble(txtStepZ.Text);
                     rangeZ.roundingDigits = dlg.Digits;
@@ -960,7 +980,8 @@ namespace WpfAppThreeD
 
                     // Apply the expression immediately
                     ApplyExpressionToZ();
-                    z=Convert.ToDouble(txtCoordinateZ.Text);
+                    z = Convert.ToDouble(txtZ.Text);
+                    //z=Convert.ToDouble(txtCoordinateZ.Text);
                     // Update the pointer
                     UpdatePoint(x, y, z);
                     UpdateSphereLabel(new Point3D(x, y, z));
