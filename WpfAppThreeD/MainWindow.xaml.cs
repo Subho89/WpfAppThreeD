@@ -340,13 +340,13 @@ namespace WpfAppThreeD
                 //txtCoordinateZ.Text = z.ToString("0.###");
                 //txtCoordinateZ.CaretIndex = txtCoordinateZ.Text.Length;
 
-                txtX.Text = x.ToString("0.###");
+                txtX.Text = x.ToString();
                 txtX.CaretIndex = txtX.Text.Length;
 
-                txtY.Text = y.ToString("0.###");
+                txtY.Text = y.ToString();
                 txtY.CaretIndex = txtY.Text.Length;
 
-                txtZ.Text = z.ToString("0.###");
+                txtZ.Text = z.ToString();
                 txtZ.CaretIndex = txtZ.Text.Length;
 
                 isUpdatingUI = false;
@@ -516,13 +516,21 @@ namespace WpfAppThreeD
 
                 string text = tb.Text;
 
+                //// ✅ Allow intermediate typing states
+                //if (string.IsNullOrEmpty(text) || text == "-" || text == "." || text == "-." || text.EndsWith(".") || text.StartsWith("."))
+                //{
+                //    return; // don’t clamp yet
+                //}
+
                 // ✅ If empty or invalid intermediate state → reset to 0
-                if (string.IsNullOrEmpty(text) || text == "-" || text == "." || text == "-.")
+                if (string.IsNullOrEmpty(text) || text == "-" || text == "." || text == "-." || text.EndsWith(".") || text.StartsWith("."))
                 {
-                    tb.Text = "0";
+                    //tb.Text = "0";
                     tb.CaretIndex = tb.Text.Length;
                     return;
                 }
+
+                
 
                 if (double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out double value))
                 {
