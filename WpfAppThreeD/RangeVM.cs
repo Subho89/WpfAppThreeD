@@ -15,5 +15,6 @@ namespace WpfAppThreeD
         public string max { get; set; }
         public double step { get; set; }
         public string expression { get; set; }
+        public int expressionDigits { get; set; }
     }
 }

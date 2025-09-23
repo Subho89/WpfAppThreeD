@@ -50,6 +50,7 @@
                                         <TextBox x:Name="txtCoordinateX" Width="80" Text="0" Margin="5,0" IsReadOnly="True" Background="BurlyWood" Foreground="Black" BorderBrush="Gray"/>
                                         <TextBlock Text="Step X:" VerticalAlignment="Center"/>
                                         <TextBox x:Name="txtStepX" Width="80" Text="1" Margin="5,0" IsReadOnly="True"/>
+                                        <CheckBox x:Name="chkSnapToGridX" Content="Snap to Grid X Axis" Margin="20,0,0,0" IsChecked="False"/>
                                     </StackPanel>
 
                                     <!-- Y Axis -->
@@ -72,6 +73,7 @@
                                         <TextBox x:Name="txtCoordinateY" Width="80" Text="0" Margin="5,0" IsReadOnly="True" Background="BurlyWood" Foreground="Black" BorderBrush="Gray"/>
                                         <TextBlock Text="Step Y:" VerticalAlignment="Center"/>
                                         <TextBox x:Name="txtStepY" Width="80" Text="1" Margin="5,0" IsReadOnly="True"/>
+                                        <CheckBox x:Name="chkSnapToGridY" Content="Snap to Grid Y Axis" Margin="20,0,0,0" IsChecked="False"/>
                                     </StackPanel>
 
                                     <!-- Z Axis -->
@@ -94,8 +96,8 @@
                                         <TextBox x:Name="txtCoordinateZ" Width="80" Text="0" Margin="5,0" IsReadOnly="True" Background="BurlyWood" Foreground="Black" BorderBrush="Gray"/>
                                         <TextBlock Text="Step Z:" VerticalAlignment="Center"/>
                                         <TextBox x:Name="txtStepZ" Width="80" Text="1" Margin="5,0" IsReadOnly="True"/>
+                                        <CheckBox x:Name="chkSnapToGridZ" Content="Snap to Grid Z Axis" Margin="20,0,0,0" IsChecked="False"/>
                                     </StackPanel>
-
                                 </StackPanel>
                             </StackPanel>
                         </Grid>
@@ -149,11 +151,11 @@ TickFrequency="0.1" IsSnapToTickEnabled="false" Margin="5,0"/>
                             <TextBox x:Name="txtPointMax" Grid.Column="3" Text="1" PreviewTextInput="NumberValidationTextBox" Margin="5,0"/>
                         </Grid>
                         <!-- Step + Snap to Grid -->
-                        <StackPanel Orientation="Horizontal" Margin="5">
-                            <!--<TextBlock Text="Step:" VerticalAlignment="Center"/>-->
-                            <!--<TextBox x:Name="txtStep" Width="50" Text="1" Margin="5,0"/>-->
+                        <!--<StackPanel Orientation="Horizontal" Margin="5">
+                            --><!--<TextBlock Text="Step:" VerticalAlignment="Center"/>-->
+                            <!--<TextBox x:Name="txtStep" Width="50" Text="1" Margin="5,0"/>--><!--
                             <CheckBox x:Name="chkSnapToGrid" Content="Snap to Grid" Margin="20,0,0,0" IsChecked="False"/>
-                        </StackPanel>
+                        </StackPanel>-->
 
                         <!-- Camera Switch -->
                         <StackPanel Orientation="Horizontal" Margin="5">

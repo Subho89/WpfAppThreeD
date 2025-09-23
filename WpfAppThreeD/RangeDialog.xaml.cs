@@ -21,6 +21,7 @@ namespace WpfAppThreeD
         public string axisCo { get; set; }
         public double step { get; set; }
         public int rounding { get; set; }
+        public int expressionDigit { get; set; }
 
         // guard to prevent re-entrancy when we update Text programmatically
         private bool isUpdatingText = false;
@@ -67,6 +68,10 @@ namespace WpfAppThreeD
             }
             txtExpression.Text=range.expression;
             sliderDigits.Value = range.roundingDigits;
+            sliderExpression.Value=range.expressionDigits;
+            txtStep.Text=Convert.ToString(range.step);
+
+
         }
 
         private void Rounding_Checked(object sender, RoutedEventArgs e)
@@ -100,6 +105,7 @@ namespace WpfAppThreeD
 
             ValidateDecimalPlaces(MinValueBox);
             ValidateDecimalPlaces(MaxValueBox);
+            ValidateDecimalPlaces(txtStep);
             // Re-validate current box contents immediately with the newly selected mode
             // (safe because ValueBox_TextChanged uses isUpdatingText guard)
             //ValueBox_TextChanged(MinValueBox, null);
@@ -146,6 +152,22 @@ namespace WpfAppThreeD
                 return;
             }
 
+            // validate step
+            if (!double.TryParse(txtStep.Text, NumberStyles.Float | NumberStyles.AllowThousands,
+                     CultureInfo.InvariantCulture, out double stepTxt))
+            {
+                MessageBox.Show("Please enter a valid numeric step value.", "Invalid Input",
+                                MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            if (stepTxt <= 0)
+            {
+                MessageBox.Show("Step value must be positive and cannot be 0.", "Invalid Step",
+                                MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
             // Additional final validations per mode (optional)
             if (SelectedMode == RoundingMode.Integer)
             {
@@ -178,6 +200,8 @@ namespace WpfAppThreeD
             Expression = txtExpression.Text.Trim();
             step=Convert.ToDouble(txtStep.Text.Trim());
             rounding = (int)SelectedMode;
+            expressionDigit=(int)sliderExpression.Value;
+
             if (!string.IsNullOrEmpty(Expression))
             {
                 if (!Expression.Contains(axisCo))
@@ -227,16 +251,16 @@ namespace WpfAppThreeD
                 {
                     if (text.Contains("."))
                     {
-                        textBox.Text = text.Split('.')[0]; // remove decimal
+                        textBox.Text = text.Split('.')[0]; // remove decimal part
                         textBox.CaretIndex = textBox.Text.Length;
                     }
                     return;
                 }
 
-                // === Even / Odd mode: integers only ===
+                // === Even / Odd modes: integers only ===
                 if (text.Contains("."))
                 {
-                    // strip off decimal part entirely
+                    // strip decimal part entirely
                     textBox.Text = text.Split('.')[0];
                     textBox.CaretIndex = textBox.Text.Length;
                     text = textBox.Text;
@@ -244,6 +268,14 @@ namespace WpfAppThreeD
 
                 if (int.TryParse(text, out int num))
                 {
+                    // Always force txtStep = 2 in Even/Odd mode
+                    if (textBox.Name == "txtStep")
+                    {
+                        textBox.Text = "2";
+                        textBox.CaretIndex = textBox.Text.Length;
+                        return;
+                    }
+
                     if (SelectedMode == RoundingMode.Even && num % 2 != 0)
                     {
                         // Snap to nearest even
@@ -265,6 +297,7 @@ namespace WpfAppThreeD
                 isUpdatingText = false;
             }
         }
+
 
 
 
@@ -352,6 +385,11 @@ namespace WpfAppThreeD
             }
             else
                 ValidateDecimalPlaces(MinValueBox);
+        }
+
+        private void txtStep_LostFocus(object sender, RoutedEventArgs e)
+        {
+            ValidateDecimalPlaces(txtStep);
         }
     }
 }

@@ -39,6 +39,13 @@ namespace WpfAppThreeD
         RangeVM rangeX = new RangeVM();
         RangeVM rangeY=new RangeVM();
         RangeVM rangeZ=new RangeVM();
+        public int decimalX;
+        public int decimalY;
+        public int decimalZ;
+        public int expressionX;
+        public int expressionY;
+        public int expressionZ;
+
         public MainWindow()
         {
             
@@ -58,6 +65,9 @@ namespace WpfAppThreeD
                 cam.UpDirection = new Vector3D(0, 1, 0);
             }
 
+            txtX.LostFocus += TxtPointerInput_LostFocus;
+            txtY.LostFocus += TxtPointerInput_LostFocus;
+            txtZ.LostFocus += TxtPointerInput_LostFocus;
             txtX.TextChanged += txtPointerInput_TextChanged;
             txtY.TextChanged += txtPointerInput_TextChanged;
             txtZ.TextChanged += txtPointerInput_TextChanged;
@@ -305,8 +315,14 @@ namespace WpfAppThreeD
             if (coordLabel != null)
                 view1.Children.Remove(coordLabel);
 
-            // format coordinates
-            string text = $"({p.X:0.0}, {p.Y:0.0}, {p.Z:0.0})";
+            // format each coordinate individually
+            string formatX = decimalX == 0 ? "0" : "F" + decimalX;
+            string formatY = decimalY == 0 ? "0" : "F" + decimalY;
+            string formatZ = decimalZ == 0 ? "0" : "F" + decimalZ;
+
+            string text = $"({p.X.ToString(formatX, CultureInfo.InvariantCulture)}, " +
+                          $"{p.Y.ToString(formatY, CultureInfo.InvariantCulture)}, " +
+                          $"{p.Z.ToString(formatZ, CultureInfo.InvariantCulture)})";
 
             // create label
             coordLabel = new BillboardTextVisual3D
@@ -321,6 +337,7 @@ namespace WpfAppThreeD
             view1.Children.Add(coordLabel);
         }
 
+
         private void UpdatePoint(double x, double y, double z)
         {
             if (pointSphere != null)
@@ -330,23 +347,25 @@ namespace WpfAppThreeD
 
                 isUpdatingUI = true; // prevent recursive TextChanged
 
-                //txtX.Text = x.ToString("0.###");
-                //txtCoordinateX.Text = x.ToString("0.###");
-                //txtCoordinateX.CaretIndex = txtCoordinateX.Text.Length;
-
-                //txtCoordinateY.Text = y.ToString("0.###");
-                //txtCoordinateY.CaretIndex = txtCoordinateY.Text.Length;
-
-                //txtCoordinateZ.Text = z.ToString("0.###");
-                //txtCoordinateZ.CaretIndex = txtCoordinateZ.Text.Length;
-
-                txtX.Text = x.ToString();
+                // X formatting
+                if (decimalX == 0)
+                    txtX.Text = x.ToString("0", CultureInfo.InvariantCulture);
+                else
+                    txtX.Text = x.ToString("F" + decimalX, CultureInfo.InvariantCulture);
                 txtX.CaretIndex = txtX.Text.Length;
 
-                txtY.Text = y.ToString();
+                // Y formatting
+                if (decimalY == 0)
+                    txtY.Text = y.ToString("0", CultureInfo.InvariantCulture);
+                else
+                    txtY.Text = y.ToString("F" + decimalY, CultureInfo.InvariantCulture);
                 txtY.CaretIndex = txtY.Text.Length;
 
-                txtZ.Text = z.ToString();
+                // Z formatting
+                if (decimalZ == 0)
+                    txtZ.Text = z.ToString("0", CultureInfo.InvariantCulture);
+                else
+                    txtZ.Text = z.ToString("F" + decimalZ, CultureInfo.InvariantCulture);
                 txtZ.CaretIndex = txtZ.Text.Length;
 
                 isUpdatingUI = false;
@@ -388,10 +407,24 @@ namespace WpfAppThreeD
                 double.TryParse(txtStepY.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out stepY);
                 double.TryParse(txtStepZ.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out stepZ);
 
-                if (chkSnapToGrid.IsChecked == true)
+                if (chkSnapToGridX.IsChecked == true)
                 {
                     newX = GetSnappedValue(newX, stepX);
+                    //newY = GetSnappedValue(newY, stepY);
+                    //newZ = GetSnappedValue(newZ, stepZ);
+                }
+
+                if (chkSnapToGridY.IsChecked == true)
+                {
+                   // newX = GetSnappedValue(newX, stepX);
                     newY = GetSnappedValue(newY, stepY);
+                    //newZ = GetSnappedValue(newZ, stepZ);
+                }
+
+                if (chkSnapToGridZ.IsChecked == true)
+                {
+                    //newX = GetSnappedValue(newX, stepX);
+                    //newY = GetSnappedValue(newY, stepY);
                     newZ = GetSnappedValue(newZ, stepZ);
                 }
 
@@ -448,6 +481,40 @@ namespace WpfAppThreeD
             }
         }
 
+        //private void view1_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        //{
+        //    if (isDragging)
+        //    {
+        //        isDragging = false;
+        //        view1.ReleaseMouseCapture();
+
+        //        // Final snap-to-grid adjustment
+        //        if (pointSphere != null && chkSnapToGrid.IsChecked == true)
+        //        {
+        //            double stepX = 1, stepY = 1, stepZ = 1;
+        //            double.TryParse(txtStepX.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out stepX);
+        //            double.TryParse(txtStepY.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out stepY);
+        //            double.TryParse(txtStepZ.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out stepZ);
+
+        //            double newX = GetSnappedValue(pointSphere.Center.X, stepX);
+        //            double newY = GetSnappedValue(pointSphere.Center.Y, stepY);
+        //            double newZ = GetSnappedValue(pointSphere.Center.Z, stepZ);
+
+        //            UpdatePoint(newX, newY, newZ);
+        //            UpdateSphereLabel(new Point3D(newX, newY, newZ));
+
+        //            txtX.Text = newX.ToString("F2");
+        //            txtY.Text = newY.ToString("F2");
+        //            txtZ.Text = newZ.ToString("F2");
+
+        //            sliderX.Value = newX;
+        //            sliderY.Value = newY;
+        //            sliderZ.Value = newZ;
+        //        }
+        //    }
+        //}
+
+
         private void view1_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             if (isDragging)
@@ -455,24 +522,32 @@ namespace WpfAppThreeD
                 isDragging = false;
                 view1.ReleaseMouseCapture();
 
-                // Final snap-to-grid adjustment
-                if (pointSphere != null && chkSnapToGrid.IsChecked == true)
+                if (pointSphere != null)
                 {
                     double stepX = 1, stepY = 1, stepZ = 1;
                     double.TryParse(txtStepX.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out stepX);
                     double.TryParse(txtStepY.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out stepY);
                     double.TryParse(txtStepZ.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out stepZ);
 
-                    double newX = GetSnappedValue(pointSphere.Center.X, stepX);
-                    double newY = GetSnappedValue(pointSphere.Center.Y, stepY);
-                    double newZ = GetSnappedValue(pointSphere.Center.Z, stepZ);
+                    double newX = pointSphere.Center.X;
+                    double newY = pointSphere.Center.Y;
+                    double newZ = pointSphere.Center.Z;
+
+                    if (chkSnapToGridX.IsChecked == true)
+                        newX = GetSnappedValue(newX, stepX);
+
+                    if (chkSnapToGridY.IsChecked == true)
+                        newY = GetSnappedValue(newY, stepY);
+
+                    if (chkSnapToGridZ.IsChecked == true)
+                        newZ = GetSnappedValue(newZ, stepZ);
 
                     UpdatePoint(newX, newY, newZ);
                     UpdateSphereLabel(new Point3D(newX, newY, newZ));
 
-                    txtX.Text = newX.ToString("F2");
-                    txtY.Text = newY.ToString("F2");
-                    txtZ.Text = newZ.ToString("F2");
+                    txtX.Text = newX.ToString("F2", CultureInfo.InvariantCulture);
+                    txtY.Text = newY.ToString("F2", CultureInfo.InvariantCulture);
+                    txtZ.Text = newZ.ToString("F2", CultureInfo.InvariantCulture);
 
                     sliderX.Value = newX;
                     sliderY.Value = newY;
@@ -481,104 +556,112 @@ namespace WpfAppThreeD
             }
         }
 
-
-
-        //private void txtPointerInput_TextChanged(object sender, TextChangedEventArgs e)
+        //private void TxtPointerInput_LostFocus(object sender, RoutedEventArgs e)
         //{
-        //    if (isUpdatingUI) return; // ignore programmatic changes
-
-        //    if (double.TryParse(txtX.Text, out double x) &&
-        //        double.TryParse(txtY.Text, out double y) &&
-        //        double.TryParse(txtZ.Text, out double z))
+        //    if (sender is TextBox tb)
         //    {
-        //        x = Math.Max(minX, Math.Min(maxX, x));
-        //        y = Math.Max(minY, Math.Min(maxY, y));
-        //        z = Math.Max(minZ, Math.Min(maxZ, z));
+        //        if (string.IsNullOrWhiteSpace(tb.Text))
+        //            tb.Text = "0";
 
-        //        UpdatePoint(x, y, z);
-
-        //        sliderX.Value = x;
-        //        sliderY.Value = y;
-        //        sliderZ.Value = z;
+        //        // Format to fixed decimals on focus loss
+        //        double value = ParseOrDefault(tb.Text);
+        //        int decimals = tb == txtX ? decimalX : tb == txtY ? decimalY : decimalZ;
+        //        tb.Text = value.ToString("F" + decimals, CultureInfo.InvariantCulture);
+        //        tb.CaretIndex = tb.Text.Length; // put caret at the end
         //    }
         //}
 
-        private void txtPointerInput_TextChanged(object sender, TextChangedEventArgs e)
+        private void TxtPointerInput_LostFocus(object sender, RoutedEventArgs e)
         {
-            if (!sliderUpdating)
+            if (sender is TextBox tb)
             {
-                txtUpdating = true;
-                if (isUpdatingUI)
-                    return; // ignore programmatic changes
+                if (string.IsNullOrWhiteSpace(tb.Text))
+                    tb.Text = "0";
 
-                TextBox tb = sender as TextBox;
-                if (tb == null) return;
+                // Parse and clamp value
+                double value = Clamp(ParseOrDefault(tb.Text),
+                                     tb == txtX ? minX : tb == txtY ? minY : minZ,
+                                     tb == txtX ? maxX : tb == txtY ? maxY : maxZ);
 
-                string text = tb.Text;
+                // Format to fixed decimals
+                int decimals = tb == txtX ? decimalX : tb == txtY ? decimalY : decimalZ;
+                int oldCaret = tb.CaretIndex;
+                int oldLength = tb.Text.Length;
 
-                //// ✅ Allow intermediate typing states
-                //if (string.IsNullOrEmpty(text) || text == "-" || text == "." || text == "-." || text.EndsWith(".") || text.StartsWith("."))
-                //{
-                //    return; // don’t clamp yet
-                //}
+                string newText = value.ToString("F" + decimals, CultureInfo.InvariantCulture);
+                tb.Text = newText;
 
-                // ✅ If empty or invalid intermediate state → reset to 0
-                if (string.IsNullOrEmpty(text) || text == "-" || text == "." || text == "-." || text.EndsWith(".") || text.StartsWith("."))
-                {
-                    //tb.Text = "0";
-                    tb.CaretIndex = tb.Text.Length;
-                    return;
-                }
+                // Adjust caret to stay close to where user typed
+                int newLength = newText.Length;
+                int delta = newLength - oldLength;
+                tb.CaretIndex = Math.Max(0, oldCaret + delta);
 
-                
+                // ✅ Update 3D point and sphere only on focus loss
+                double x = Clamp(ParseOrDefault(txtX.Text), minX, maxX);
+                double y = Clamp(ParseOrDefault(txtY.Text), minY, maxY);
+                double z = Clamp(ParseOrDefault(txtZ.Text), minZ, maxZ);
 
-                if (double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out double value))
-                {
-                    double x = sliderX.Value;
-                    double y = sliderY.Value;
-                    double z = sliderZ.Value;
+                UpdatePoint(x, y, z);
+                UpdateSphereLabel(new Point3D(x, y, z));
 
-                    if (tb == txtX) x = value;
-                    if (tb == txtY) y = value;
-                    if (tb == txtZ) z = value;
-
-                    // clamp
-                    x = Math.Max(minX, Math.Min(maxX, x));
-                    y = Math.Max(minY, Math.Min(maxY, y));
-                    z = Math.Max(minZ, Math.Min(maxZ, z));
-
-                    // ✅ keep clamped values in textboxes
-                    txtX.Text = x.ToString(CultureInfo.InvariantCulture);
-                    txtY.Text = y.ToString(CultureInfo.InvariantCulture);
-                    txtZ.Text = z.ToString(CultureInfo.InvariantCulture);
-
-                    txtX.CaretIndex = txtX.Text.Length;
-                    txtY.CaretIndex = txtY.Text.Length;
-                    txtZ.CaretIndex = txtZ.Text.Length;
-
-                    ApplyExpressionToX();
-                    ApplyExpressionToY();
-                    ApplyExpressionToZ();
-
-                    //x = Convert.ToDouble(txtCoordinateX.Text, CultureInfo.InvariantCulture);
-                    //y = Convert.ToDouble(txtCoordinateY.Text, CultureInfo.InvariantCulture);
-                    //z = Convert.ToDouble(txtCoordinateZ.Text, CultureInfo.InvariantCulture);
-
-                    x = Convert.ToDouble(txtX.Text, CultureInfo.InvariantCulture);
-                    y = Convert.ToDouble(txtY.Text, CultureInfo.InvariantCulture);
-                    z = Convert.ToDouble(txtZ.Text, CultureInfo.InvariantCulture);
-
-                    UpdatePoint(x, y, z); // Apply updates
-                    UpdateSphereLabel(new Point3D(x, y, z));
-
-                    sliderX.Value = Convert.ToDouble(txtX.Text, CultureInfo.InvariantCulture);
-                    sliderY.Value = Convert.ToDouble(txtY.Text, CultureInfo.InvariantCulture);
-                    sliderZ.Value = Convert.ToDouble(txtZ.Text, CultureInfo.InvariantCulture);
-
-                    txtUpdating = false;
-                }
+                // Update sliders
+                sliderX.Value = x;
+                sliderY.Value = y;
+                sliderZ.Value = z;
             }
         }
+
+        private void txtPointerInput_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (sliderUpdating || isUpdatingUI || txtUpdating)
+                return;
+
+            TextBox tb = sender as TextBox;
+            if (tb == null) return;
+
+            string text = tb.Text;
+
+            // Allow intermediate typing states
+            if (string.IsNullOrEmpty(text) || text == "-" || text == "." || text == "-.")
+                return;
+
+            if (double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out double value))
+            {
+                txtUpdating = true;
+
+                // Clamp values from each textbox
+                double x = Clamp(ParseOrDefault(txtX.Text), minX, maxX);
+                double y = Clamp(ParseOrDefault(txtY.Text), minY, maxY);
+                double z = Clamp(ParseOrDefault(txtZ.Text), minZ, maxZ);
+
+                // Update point and sliders WITHOUT overwriting text
+                //UpdatePoint(x, y, z);
+                //UpdateSphereLabel(new Point3D(x, y, z));
+
+                //sliderX.Value = x;
+                //sliderY.Value = y;
+                //sliderZ.Value = z;
+
+                txtUpdating = false;
+            }
+        }
+
+        private string FormatWithDecimals(double value, int decimals)
+        {
+            if (decimals == 0)
+                return value.ToString("0", CultureInfo.InvariantCulture);
+            else
+                return value.ToString("F" + decimals, CultureInfo.InvariantCulture);
+        }
+
+        // 🔹 Helpers
+        private static double Clamp(double value, double min, double max) =>
+            Math.Max(min, Math.Min(max, value));
+
+        private static double ParseOrDefault(string text) =>
+            double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out var v) ? v : 0;
+
+
 
 
         private void txtRange_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
@@ -607,12 +690,14 @@ namespace WpfAppThreeD
                 
                 UpdatePoint(0, 0, 0);
                 AddPoint(0, 0, 0);
+                isUpdatingUI = true;
                 txtX.Text = "0";
                 txtY.Text = "0";
                 txtZ.Text = "0";
                 txtCoordinateX.Text = "0";
                 txtCoordinateY.Text = "0";
                 txtCoordinateZ.Text = "0";
+                isUpdatingUI = false;
             }
         }
 
@@ -632,17 +717,27 @@ namespace WpfAppThreeD
                 double stepY = ParseStep(txtStepY.Text, 1);
                 double stepZ = ParseStep(txtStepZ.Text, 1);
 
-                if (chkSnapToGrid.IsChecked == true)
+                if (chkSnapToGridX.IsChecked == true)
                 {
                     newX = GetSnappedValue(newX, stepX);
-                    newY = GetSnappedValue(newY, stepY);
-                    newZ = GetSnappedValue(newZ, stepZ);
-
-                    // Prevent feedback loops
-                    if (Math.Abs(sliderX.Value - newX) > double.Epsilon) sliderX.Value = newX;
-                    if (Math.Abs(sliderY.Value - newY) > double.Epsilon) sliderY.Value = newY;
-                    if (Math.Abs(sliderZ.Value - newZ) > double.Epsilon) sliderZ.Value = newZ;
+                    if (Math.Abs(sliderX.Value - newX) > double.Epsilon)
+                        sliderX.Value = newX;
                 }
+
+                if (chkSnapToGridY.IsChecked == true)
+                {
+                    newY = GetSnappedValue(newY, stepY);
+                    if (Math.Abs(sliderY.Value - newY) > double.Epsilon)
+                        sliderY.Value = newY;
+                }
+
+                if (chkSnapToGridZ.IsChecked == true)
+                {
+                    newZ = GetSnappedValue(newZ, stepZ);
+                    if (Math.Abs(sliderZ.Value - newZ) > double.Epsilon)
+                        sliderZ.Value = newZ;
+                }
+
 
                 // Apply expressions here
                 txtX.Text = newX.ToString(CultureInfo.InvariantCulture);
@@ -841,7 +936,6 @@ namespace WpfAppThreeD
                 rangeX.max= (txtMaxX.Text);
                 rangeX.expression = txtXExp.Text;
                 rangeX.step = Convert.ToDouble(txtStepX.Text);
-                
 
                 var dlg = new RangeDialog(rangeX) { Owner = this };
                 if (dlg.ShowDialog() == true)
@@ -861,6 +955,23 @@ namespace WpfAppThreeD
                     rangeX.step = Convert.ToDouble(txtStepX.Text);
                     rangeX.roundingDigits = dlg.Digits;
                     rangeX.rounding=dlg.rounding;
+                    rangeX.expressionDigits = dlg.expressionDigit;
+
+                    if (rangeX.rounding == 0)
+                    {
+                        decimalX = rangeX.roundingDigits;
+                    }
+                    else if (rangeX.rounding == 2 || rangeX.rounding == 3)
+                    {
+                        chkSnapToGridX.IsChecked = true;
+                        decimalX = 0;
+                    }
+                    else
+                    {
+                        decimalX = 0;
+                    }
+
+                    expressionX=rangeX.expressionDigits;
 
 
                     DrawGrid();
@@ -875,6 +986,8 @@ namespace WpfAppThreeD
 
                     // Apply the expression immediately
                     ApplyExpressionToX();
+                    ApplyExpressionToY();
+                    ApplyExpressionToZ();
                     x = Convert.ToDouble(txtX.Text);
                     //x = Convert.ToDouble(txtCoordinateX.Text);
                     // Update the pointer
@@ -919,8 +1032,25 @@ namespace WpfAppThreeD
                     rangeY.step = Convert.ToDouble(txtStepY.Text);
                     rangeY.roundingDigits = dlg.Digits;
                     rangeY.rounding = dlg.rounding;
+                    rangeY.expressionDigits = dlg.expressionDigit;
 
-                    DrawGrid();
+                    if (rangeY.rounding == 0)
+                    {
+                        decimalY = rangeY.roundingDigits;
+                    }
+                    else if (rangeY.rounding == 2 || rangeY.rounding == 3)
+                    {
+                        chkSnapToGridY.IsChecked = true;
+                        decimalX = 0;
+                    }
+                    else
+                    {
+                        decimalY = 0;
+                    }
+
+                    expressionY = rangeY.expressionDigits;
+
+                        DrawGrid();
                     // Save rounding / digits / expression
                     ApplyRangeSettings("Y", dlg);
 
@@ -931,7 +1061,9 @@ namespace WpfAppThreeD
 
 
                     // Apply the expression immediately
+                    ApplyExpressionToX();
                     ApplyExpressionToY();
+                    ApplyExpressionToZ();
                     y = Convert.ToDouble(txtY.Text);
                     //y = Convert.ToDouble(txtCoordinateY.Text);
                     // Update the pointer
@@ -975,6 +1107,23 @@ namespace WpfAppThreeD
                     rangeZ.step = Convert.ToDouble(txtStepZ.Text);
                     rangeZ.roundingDigits = dlg.Digits;
                     rangeZ.rounding = dlg.rounding;
+                    rangeZ.expressionDigits = dlg.expressionDigit;
+
+                    if (rangeZ.rounding == 0)
+                    {
+                        decimalZ = rangeZ.roundingDigits;
+                    }
+                    else if (rangeZ.rounding == 2 || rangeZ.rounding == 3)
+                    {
+                        chkSnapToGridZ.IsChecked = true;
+                        decimalX = 0;
+                    }
+                    else
+                    {
+                        decimalZ = 0;
+                    }
+
+                    expressionZ = rangeZ.expressionDigits;
 
                     DrawGrid();
                     // Save rounding / digits / expression
@@ -984,9 +1133,11 @@ namespace WpfAppThreeD
                     double x = pointSphere.Center.X;
                     double y = pointSphere.Center.Y;
                     double z = pointSphere.Center.Z;
-                    
+
 
                     // Apply the expression immediately
+                    ApplyExpressionToX();
+                    ApplyExpressionToY();
                     ApplyExpressionToZ();
                     z = Convert.ToDouble(txtZ.Text);
                     //z=Convert.ToDouble(txtCoordinateZ.Text);
@@ -1029,10 +1180,17 @@ namespace WpfAppThreeD
 
                         var result = exp.Evaluate();
 
+                        double value;
                         if (result is double d)
-                            txtCoordinateX.Text = d.ToString("0.###", CultureInfo.InvariantCulture);
-                        else
-                            txtCoordinateX.Text = result.ToString();
+                            value = d;
+                        else if (!double.TryParse(result.ToString(), NumberStyles.Float, CultureInfo.InvariantCulture, out value))
+                            value = originalX;
+
+                        // Get the number of decimal places from expressionX
+                        int decimals = (int)expressionX; // expressionX = 0, 1, 2, ...
+
+                        // Format exactly with decimals
+                        txtCoordinateX.Text = value.ToString("F" + decimals, CultureInfo.InvariantCulture);
                     }
                     catch (Exception ex)
                     {
@@ -1042,16 +1200,21 @@ namespace WpfAppThreeD
                 }
                 else
                 {
-                    txtCoordinateX.Text = originalX.ToString("0.###", CultureInfo.InvariantCulture);
+                    // No expression: still respect decimals
+                    int decimals = (int)expressionX;
+                    txtCoordinateX.Text = originalX.ToString("F" + decimals, CultureInfo.InvariantCulture);
                 }
             }
         }
+
 
         private void ApplyExpressionToY()
         {
             if (double.TryParse(txtY.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out double originalY))
             {
                 string expression = txtYExp.Text;
+
+                double value = originalY; // fallback value
 
                 if (!string.IsNullOrWhiteSpace(expression))
                 {
@@ -1065,20 +1228,21 @@ namespace WpfAppThreeD
                         var result = exp.Evaluate();
 
                         if (result is double d)
-                            txtCoordinateY.Text = d.ToString("0.###", CultureInfo.InvariantCulture);
-                        else
-                            txtCoordinateY.Text = result.ToString();
+                            value = d;
+                        else if (!double.TryParse(result.ToString(), NumberStyles.Float, CultureInfo.InvariantCulture, out value))
+                            value = originalY;
                     }
                     catch (Exception ex)
                     {
                         txtCoordinateY.Text = "ERR";
                         Console.WriteLine($"Expression error in Y: {ex.Message}");
+                        return;
                     }
                 }
-                else
-                {
-                    txtCoordinateY.Text = originalY.ToString("0.###", CultureInfo.InvariantCulture);
-                }
+
+                // Respect decimal count from expressionY
+                int decimals = (int)expressionY; // expressionY = 0, 1, 2, ...
+                txtCoordinateY.Text = value.ToString("F" + decimals, CultureInfo.InvariantCulture);
             }
         }
 
@@ -1087,6 +1251,8 @@ namespace WpfAppThreeD
             if (double.TryParse(txtZ.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out double originalZ))
             {
                 string expression = txtZExp.Text;
+
+                double value = originalZ; // fallback value
 
                 if (!string.IsNullOrWhiteSpace(expression))
                 {
@@ -1100,23 +1266,23 @@ namespace WpfAppThreeD
                         var result = exp.Evaluate();
 
                         if (result is double d)
-                            txtCoordinateZ.Text = d.ToString("0.###", CultureInfo.InvariantCulture);
-                        else
-                            txtCoordinateZ.Text = result.ToString();
+                            value = d;
+                        else if (!double.TryParse(result.ToString(), NumberStyles.Float, CultureInfo.InvariantCulture, out value))
+                            value = originalZ;
                     }
                     catch (Exception ex)
                     {
                         txtCoordinateZ.Text = "ERR";
                         Console.WriteLine($"Expression error in Z: {ex.Message}");
+                        return;
                     }
                 }
-                else
-                {
-                    txtCoordinateZ.Text = originalZ.ToString("0.###", CultureInfo.InvariantCulture);
-                }
+
+                // Respect decimal count from expressionZ
+                int decimals = (int)expressionZ; // expressionZ = 0, 1, 2, ...
+                txtCoordinateZ.Text = value.ToString("F" + decimals, CultureInfo.InvariantCulture);
             }
         }
-
 
     }
 }
