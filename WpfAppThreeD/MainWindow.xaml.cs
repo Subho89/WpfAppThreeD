@@ -703,75 +703,146 @@ namespace WpfAppThreeD
 
         private void Slider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            if (!txtUpdating)
+            if (txtUpdating) return;
+
+            sliderUpdating = true;
+
+            double newX = sliderX.Value;
+            double newY = sliderY.Value;
+            double newZ = sliderZ.Value;
+
+            double stepX = ParseStep(txtStepX.Text, 1);
+            double stepY = ParseStep(txtStepY.Text, 1);
+            double stepZ = ParseStep(txtStepZ.Text, 1);
+
+            if (chkSnapToGridX.IsChecked == true)
             {
-                sliderUpdating = true;
-                if (pointSphere == null) return;
-
-                double newX = sliderX.Value;
-                double newY = sliderY.Value;
-                double newZ = sliderZ.Value;
-
-                // Snap-to-Grid logic
-                double stepX = ParseStep(txtStepX.Text, 1);
-                double stepY = ParseStep(txtStepY.Text, 1);
-                double stepZ = ParseStep(txtStepZ.Text, 1);
-
-                if (chkSnapToGridX.IsChecked == true)
-                {
-                    newX = GetSnappedValue(newX, stepX);
-                    if (Math.Abs(sliderX.Value - newX) > double.Epsilon)
-                        sliderX.Value = newX;
-                }
-
-                if (chkSnapToGridY.IsChecked == true)
-                {
-                    newY = GetSnappedValue(newY, stepY);
-                    if (Math.Abs(sliderY.Value - newY) > double.Epsilon)
-                        sliderY.Value = newY;
-                }
-
-                if (chkSnapToGridZ.IsChecked == true)
-                {
-                    newZ = GetSnappedValue(newZ, stepZ);
-                    if (Math.Abs(sliderZ.Value - newZ) > double.Epsilon)
-                        sliderZ.Value = newZ;
-                }
-
-
-                // Apply expressions here
-                txtX.Text = newX.ToString(CultureInfo.InvariantCulture);
-                txtY.Text = newY.ToString(CultureInfo.InvariantCulture);
-                txtZ.Text = newZ.ToString(CultureInfo.InvariantCulture);
-
-                ApplyExpressionToX();
-                ApplyExpressionToY();
-                ApplyExpressionToZ();
-
-                //// Read expression results back
-                //if (!double.TryParse(txtCoordinateX.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out newX))
-                //    newX = 0;
-                //if (!double.TryParse(txtCoordinateY.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out newY))
-                //    newY = 0;
-                //if (!double.TryParse(txtCoordinateZ.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out newZ))
-                //    newZ = 0;
-
-                // Read expression results back
-                if (!double.TryParse(txtX.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out newX))
-                    newX = 0;
-                if (!double.TryParse(txtY.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out newY))
-                    newY = 0;
-                if (!double.TryParse(txtZ.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out newZ))
-                    newZ = 0;
-
-                // Apply updates
-                UpdatePoint(newX, newY, newZ);
-                UpdateSphereLabel(new Point3D(newX, newY, newZ));
-
-                sliderUpdating = false;
+                newX = SnapWithinRange(newX, sliderX.Minimum, sliderX.Maximum, stepX);
+                if (Math.Abs(sliderX.Value - newX) > double.Epsilon)
+                    sliderX.Value = newX;
             }
-            
+
+            if (chkSnapToGridY.IsChecked == true)
+            {
+                newY = SnapWithinRange(newY, sliderY.Minimum, sliderY.Maximum, stepY);
+                if (Math.Abs(sliderY.Value - newY) > double.Epsilon)
+                    sliderY.Value = newY;
+            }
+
+            if (chkSnapToGridZ.IsChecked == true)
+            {
+                newZ = SnapWithinRange(newZ, sliderZ.Minimum, sliderZ.Maximum, stepZ);
+                if (Math.Abs(sliderZ.Value - newZ) > double.Epsilon)
+                    sliderZ.Value = newZ;
+            }
+
+            // Update UI textboxes
+            txtX.Text = newX.ToString(CultureInfo.InvariantCulture);
+            txtY.Text = newY.ToString(CultureInfo.InvariantCulture);
+            txtZ.Text = newZ.ToString(CultureInfo.InvariantCulture);
+
+            // Apply expressions
+            ApplyExpressionToX();
+            ApplyExpressionToY();
+            ApplyExpressionToZ();
+
+            // Final parsed values
+            if (!double.TryParse(txtX.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out newX)) newX = 0;
+            if (!double.TryParse(txtY.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out newY)) newY = 0;
+            if (!double.TryParse(txtZ.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out newZ)) newZ = 0;
+
+            UpdatePoint(newX, newY, newZ);
+            UpdateSphereLabel(new Point3D(newX, newY, newZ));
+
+            sliderUpdating = false;
         }
+
+        private double SnapWithinRange(double value, double min, double max, double step)
+        {
+            if (step <= 0) return value;
+
+            // Snap to nearest multiple of step from min
+            double snapped = min + Math.Round((value - min) / step) * step;
+
+            // Clamp to [min, max]
+            if (snapped < min) snapped = min;
+            if (snapped > max) snapped = max;
+
+            return snapped;
+        }
+
+
+        //private void Slider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        //{
+        //    if (!txtUpdating)
+        //    {
+        //        sliderUpdating = true;
+        //        if (pointSphere == null) return;
+
+        //        double newX = sliderX.Value;
+        //        double newY = sliderY.Value;
+        //        double newZ = sliderZ.Value;
+
+        //        // Snap-to-Grid logic
+        //        double stepX = ParseStep(txtStepX.Text, 1);
+        //        double stepY = ParseStep(txtStepY.Text, 1);
+        //        double stepZ = ParseStep(txtStepZ.Text, 1);
+
+        //        if (chkSnapToGridX.IsChecked == true)
+        //        {
+        //            newX = GetSnappedValue(newX, stepX);
+        //            if (Math.Abs(sliderX.Value - newX) > double.Epsilon)
+        //                sliderX.Value = newX;
+        //        }
+
+        //        if (chkSnapToGridY.IsChecked == true)
+        //        {
+        //            newY = GetSnappedValue(newY, stepY);
+        //            if (Math.Abs(sliderY.Value - newY) > double.Epsilon)
+        //                sliderY.Value = newY;
+        //        }
+
+        //        if (chkSnapToGridZ.IsChecked == true)
+        //        {
+        //            newZ = GetSnappedValue(newZ, stepZ);
+        //            if (Math.Abs(sliderZ.Value - newZ) > double.Epsilon)
+        //                sliderZ.Value = newZ;
+        //        }
+
+
+        //        // Apply expressions here
+        //        txtX.Text = newX.ToString(CultureInfo.InvariantCulture);
+        //        txtY.Text = newY.ToString(CultureInfo.InvariantCulture);
+        //        txtZ.Text = newZ.ToString(CultureInfo.InvariantCulture);
+
+        //        ApplyExpressionToX();
+        //        ApplyExpressionToY();
+        //        ApplyExpressionToZ();
+
+        //        //// Read expression results back
+        //        //if (!double.TryParse(txtCoordinateX.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out newX))
+        //        //    newX = 0;
+        //        //if (!double.TryParse(txtCoordinateY.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out newY))
+        //        //    newY = 0;
+        //        //if (!double.TryParse(txtCoordinateZ.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out newZ))
+        //        //    newZ = 0;
+
+        //        // Read expression results back
+        //        if (!double.TryParse(txtX.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out newX))
+        //            newX = 0;
+        //        if (!double.TryParse(txtY.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out newY))
+        //            newY = 0;
+        //        if (!double.TryParse(txtZ.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out newZ))
+        //            newZ = 0;
+
+        //        // Apply updates
+        //        UpdatePoint(newX, newY, newZ);
+        //        UpdateSphereLabel(new Point3D(newX, newY, newZ));
+
+        //        sliderUpdating = false;
+        //    }
+
+        //}
 
         private double ParseStep(string input, double fallback)
         {
@@ -993,6 +1064,7 @@ namespace WpfAppThreeD
                     // Update the pointer
                     UpdatePoint(x, y, z);
                     UpdateSphereLabel(new Point3D(x, y, z));
+                    //sliderX.Value=Convert.ToDouble(rangeX.min);
                 }
             }
         }
@@ -1144,6 +1216,7 @@ namespace WpfAppThreeD
                     // Update the pointer
                     UpdatePoint(x, y, z);
                     UpdateSphereLabel(new Point3D(x, y, z));
+
                 }
             }
         }

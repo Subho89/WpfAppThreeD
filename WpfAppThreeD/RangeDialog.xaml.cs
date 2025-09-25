@@ -94,18 +94,24 @@ namespace WpfAppThreeD
                 SelectedMode = RoundingMode.Even;
                 sliderDigits.Visibility = Visibility.Collapsed;
                 txtDigits.Visibility = Visibility.Collapsed;
+
+                txtStep.Text = "2";
+                txtStep.CaretIndex = txtStep.Text.Length;
             }
             else if (btnO.IsChecked == true)
             {
                 SelectedMode = RoundingMode.Odd;
                 sliderDigits.Visibility = Visibility.Collapsed;
                 txtDigits.Visibility = Visibility.Collapsed;
+
+                txtStep.Text = "2";
+                txtStep.CaretIndex = txtStep.Text.Length;
             }
 
 
             ValidateDecimalPlaces(MinValueBox);
             ValidateDecimalPlaces(MaxValueBox);
-            ValidateDecimalPlaces(txtStep);
+            //ValidateDecimalPlaces(txtStep);
             // Re-validate current box contents immediately with the newly selected mode
             // (safe because ValueBox_TextChanged uses isUpdatingText guard)
             //ValueBox_TextChanged(MinValueBox, null);
@@ -271,8 +277,8 @@ namespace WpfAppThreeD
                     // Always force txtStep = 2 in Even/Odd mode
                     if (textBox.Name == "txtStep")
                     {
-                        textBox.Text = "2";
-                        textBox.CaretIndex = textBox.Text.Length;
+                        //textBox.Text = "2";
+                        //textBox.CaretIndex = textBox.Text.Length;
                         return;
                     }
 
