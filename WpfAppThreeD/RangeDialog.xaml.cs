@@ -47,6 +47,7 @@ namespace WpfAppThreeD
         {
             MinValueBox.Text =Convert.ToString(range.min);
             MaxValueBox.Text = Convert.ToString(range.max);
+            this.Title = range.axis + " Range Settings";
             lblExpression.Text = "Expression (Use " + range.axis + " in Caps as the original value of the coordinate to generate the expression.)";
             axisCo = range.axis;
             txtStep.Text = Convert.ToString(range.step);
@@ -88,12 +89,15 @@ namespace WpfAppThreeD
                 SelectedMode = RoundingMode.Integer;
                 sliderDigits.Visibility = Visibility.Collapsed;
                 txtDigits.Visibility = Visibility.Collapsed;
+                sliderDigits.Value = 0;
             }
             else if (btnE.IsChecked == true)
             {
                 SelectedMode = RoundingMode.Even;
                 sliderDigits.Visibility = Visibility.Collapsed;
                 txtDigits.Visibility = Visibility.Collapsed;
+                sliderDigits.Value = 0;
+
 
                 txtStep.Text = "2";
                 txtStep.CaretIndex = txtStep.Text.Length;
@@ -103,6 +107,7 @@ namespace WpfAppThreeD
                 SelectedMode = RoundingMode.Odd;
                 sliderDigits.Visibility = Visibility.Collapsed;
                 txtDigits.Visibility = Visibility.Collapsed;
+                sliderDigits.Value = 0;
 
                 txtStep.Text = "2";
                 txtStep.CaretIndex = txtStep.Text.Length;
@@ -154,6 +159,13 @@ namespace WpfAppThreeD
                 !double.TryParse(MaxValueBox.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out double max))
             {
                 MessageBox.Show("Please enter valid numeric min/max values.", "Invalid Input",
+                                MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            if (min >= max)
+            {
+                MessageBox.Show("Minimum value must be smaller than Maximum value.", "Invalid Range",
                                 MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
@@ -255,6 +267,7 @@ namespace WpfAppThreeD
                 // === Integer mode: only integers allowed ===
                 if (SelectedMode == RoundingMode.Integer)
                 {
+                    sliderDigits.Value = 0;
                     if (text.Contains("."))
                     {
                         textBox.Text = text.Split('.')[0]; // remove decimal part
@@ -284,6 +297,7 @@ namespace WpfAppThreeD
 
                     if (SelectedMode == RoundingMode.Even && num % 2 != 0)
                     {
+                        sliderDigits.Value = 0;
                         // Snap to nearest even
                         num = (num > 0) ? num - 1 : num + 1;
                         textBox.Text = num.ToString(CultureInfo.InvariantCulture);
@@ -291,6 +305,7 @@ namespace WpfAppThreeD
                     }
                     else if (SelectedMode == RoundingMode.Odd && num % 2 == 0)
                     {
+                        sliderDigits.Value = 0;
                         // Snap to nearest odd
                         num = (num > 0) ? num + 1 : num - 1;
                         textBox.Text = num.ToString(CultureInfo.InvariantCulture);
@@ -302,7 +317,7 @@ namespace WpfAppThreeD
             {
                 isUpdatingText = false;
             }
-        }
+        } 
 
 
 
@@ -395,6 +410,15 @@ namespace WpfAppThreeD
 
         private void txtStep_LostFocus(object sender, RoutedEventArgs e)
         {
+            // if parse fails or step <= 0, reset to a sensible default (1)
+            if (!double.TryParse(txtStep.Text, NumberStyles.Float | NumberStyles.AllowThousands,
+                                 CultureInfo.InvariantCulture, out double step) || step <= 0)
+            {
+                MessageBox.Show("Step must be a positive number. Resetting to 1.", "Invalid Step",
+                                MessageBoxButton.OK, MessageBoxImage.Warning);
+                txtStep.Text = "1";
+            }
+
             ValidateDecimalPlaces(txtStep);
         }
     }
