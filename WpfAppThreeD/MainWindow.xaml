@@ -46,7 +46,7 @@
                                  PreviewTextInput="NumberValidationTextBox" DataObject.Pasting="TextBox_Pasting"/>
                                         <TextBlock Text="X Expression:" VerticalAlignment="Center"/>
                                         <TextBox x:Name="txtXExp" Width="80" Text="" Margin="5,0" IsReadOnly="True" Background="LightYellow" Foreground="Black" BorderBrush="Gray"/>
-                                        <TextBlock Text="X Coordinates:" VerticalAlignment="Center"/>
+                                        <TextBlock Text="X Expression Values:" VerticalAlignment="Center"/>
                                         <TextBox x:Name="txtCoordinateX" Width="80" Text="0" Margin="5,0" IsReadOnly="True" Background="BurlyWood" Foreground="Black" BorderBrush="Gray"/>
                                         <TextBlock Text="Step X:" VerticalAlignment="Center"/>
                                         <TextBox x:Name="txtStepX" Width="80" Text="1" Margin="5,0" IsReadOnly="True"/>
@@ -69,7 +69,7 @@
                                  PreviewTextInput="NumberValidationTextBox"/>
                                         <TextBlock Text="Y Expression:" VerticalAlignment="Center"/>
                                         <TextBox x:Name="txtYExp" Width="80" Text="" Margin="5,0" IsReadOnly="True" Background="LightYellow" Foreground="Black" BorderBrush="Gray"/>
-                                        <TextBlock Text="Y Coordinates:" VerticalAlignment="Center"/>
+                                        <TextBlock Text="Y Expression Values:" VerticalAlignment="Center"/>
                                         <TextBox x:Name="txtCoordinateY" Width="80" Text="0" Margin="5,0" IsReadOnly="True" Background="BurlyWood" Foreground="Black" BorderBrush="Gray"/>
                                         <TextBlock Text="Step Y:" VerticalAlignment="Center"/>
                                         <TextBox x:Name="txtStepY" Width="80" Text="1" Margin="5,0" IsReadOnly="True"/>
@@ -92,7 +92,7 @@
                                  PreviewTextInput="NumberValidationTextBox"/>
                                         <TextBlock Text="Z Expression:" VerticalAlignment="Center"/>
                                         <TextBox x:Name="txtZExp" Width="80" Text="" Margin="5,0" IsReadOnly="True" Background="LightYellow" Foreground="Black" BorderBrush="Gray"/>
-                                        <TextBlock Text="Z Coordinates:" VerticalAlignment="Center"/>
+                                        <TextBlock Text="Z Expression Values:" VerticalAlignment="Center"/>
                                         <TextBox x:Name="txtCoordinateZ" Width="80" Text="0" Margin="5,0" IsReadOnly="True" Background="BurlyWood" Foreground="Black" BorderBrush="Gray"/>
                                         <TextBlock Text="Step Z:" VerticalAlignment="Center"/>
                                         <TextBox x:Name="txtStepZ" Width="80" Text="1" Margin="5,0" IsReadOnly="True"/>
