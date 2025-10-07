@@ -308,73 +308,9 @@ namespace WpfAppThreeD
             if (pointSphere != null) view1.Children.Add(pointSphere);
             if (coordLabel != null) view1.Children.Add(coordLabel);
             if (pointSphere != null) DrawGuides(pointSphere.Center);
+
+            AdjustCameraTo3DGrid();
         }
-
-
-
-
-        //private void DrawGuides(Point3D p)
-        //{
-        //    // remove old guide lines
-        //    for (int i = view1.Children.Count - 1; i >= 0; i--)
-        //    {
-        //        if (view1.Children[i] is LinesVisual3D line &&
-        //            (line.Color == Colors.Goldenrod))
-        //        {
-        //            view1.Children.RemoveAt(i);
-        //        }
-        //    }
-
-        //    var guideThickness = 2.0;
-
-        //    // === Yellow Guides===
-        //    view1.Children.Add(new LinesVisual3D
-        //    {
-        //        Color = Colors.Goldenrod,   // darker yellow
-        //        Thickness = guideThickness,
-        //        Points = new Point3DCollection
-        //    {
-        //        new Point3D(p.X, 0, 0),
-        //        new Point3D(p.X, p.Y, 0)
-        //    }
-        //    });
-
-        //    view1.Children.Add(new LinesVisual3D
-        //    {
-        //        Color = Colors.Goldenrod,
-        //        Thickness = guideThickness,
-        //        Points = new Point3DCollection
-        //    {
-        //        new Point3D(0, p.Y, 0),
-        //        new Point3D(p.X, p.Y, 0)
-        //    }
-        //    });
-
-        //    view1.Children.Add(new LinesVisual3D
-        //    {
-        //        Color = Colors.Goldenrod,
-        //        Thickness = guideThickness,
-        //        Points = new Point3DCollection
-        //    {
-        //        new Point3D(p.X, p.Y, 0),
-        //        new Point3D(p.X, p.Y, p.Z)
-        //    }
-        //    });
-
-        //    // New guide from Z axis to pointer
-        //    view1.Children.Add(new LinesVisual3D
-        //    {
-        //        Color = Colors.Goldenrod,
-        //        Thickness = guideThickness,
-        //        Points = new Point3DCollection
-        //{
-        //    new Point3D(0, 0, p.Z),
-        //    new Point3D(p.X, p.Y, p.Z)
-        //}
-        //    });
-
-        //}
-
 
         private void DrawGuides(Point3D p)
         {
@@ -1612,6 +1548,32 @@ namespace WpfAppThreeD
                 txtCoordinateZ.Text = value.ToString("F" + decimals, CultureInfo.InvariantCulture);
             }
         }
+
+        private void AdjustCameraTo3DGrid()
+        {
+            // Compute center of current 3D grid
+            double centerX = (minX + maxX) / 2.0;
+            double centerY = (minY + maxY) / 2.0;
+            double centerZ = (minZ + maxZ) / 2.0;
+
+            // Compute approximate "radius" or scale of the grid
+            double sizeX = Math.Abs(maxX - minX);
+            double sizeY = Math.Abs(maxY - minY);
+            double sizeZ = Math.Abs(maxZ - minZ);
+            double size = Math.Max(sizeX, Math.Max(sizeY, sizeZ));
+
+            var cam = view1.Camera as PerspectiveCamera;
+            if (cam == null) return;
+
+            // Distance: proportional to grid size (so bigger cube = further camera)
+            double distance = size * 2.5;
+
+            // Place camera in a diagonal direction (3D view)
+            cam.Position = new Point3D(centerX + distance, centerY + distance, centerZ + distance);
+            cam.LookDirection = new Vector3D(-distance, -distance, -distance); // towards center
+            cam.UpDirection = new Vector3D(0, 1, 0); // Y-axis up
+        }
+
 
     }
 }
